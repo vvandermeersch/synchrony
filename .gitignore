@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+synchrony.Rproj
+
+**/data/eobs/
+
+**/scripts/old/
+
+
