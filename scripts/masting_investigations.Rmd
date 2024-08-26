@@ -2,7 +2,9 @@
 title: "Synchrony investigations - Fagus masting"
 author: "Victor, Lizzie"
 date: "2024-08-22"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -95,6 +97,7 @@ dat <- data.frame(
 )
 
 # Moving window correlation across year for each site (note the log-transformation of seed production)
+## according to the paper, log and not log+1, so I guess they did the calculation with log(0) = -Inf?
 mwcor <- lapply(7:365, function(d) {
 
   dat %>%
@@ -148,7 +151,7 @@ mwcor %>%
 ```
 
 But we could also compute these correlations differently, right?
-If we take the correlation between moving average temperature and seed production, it gives quite similar results.
+If we take the correlation between moving average temperature and seed production, it gives quite similar results. (Note : my bad, this is actually what Valentin has done!)
 
 ```{r fig1c_alternative}
 
@@ -158,9 +161,9 @@ mwcor_alt <- dat %>%
   ungroup() %>%
   group_by(site, doy) %>%
   dplyr::summarise(
-    cor0 = cor(rwtmean, prod0, use="complete.obs", method = "spearman"),
-    cor1 = cor(rwtmean, prod1, use="complete.obs", method = "spearman"),
-    cor2 = cor(rwtmean, prod2, use="complete.obs", method = "spearman")
+    cor0 = cor(rwtmean, log(prod0), use="complete.obs", method = "spearman"),
+    cor1 = cor(rwtmean, log(prod1), use="complete.obs", method = "spearman"),
+    cor2 = cor(rwtmean, log(prod2), use="complete.obs", method = "spearman")
   ) %>%
   tidyr::pivot_longer(cols = c("cor0", "cor1", "cor2")) %>% 
   dplyr::mutate(doy_plot = if_else(name == "cor2", as.Date(doy, origin = "2001-01-01"),
@@ -524,57 +527,3 @@ data.frame(
 
 ```
 
-
-
-
-
-
-
-```{r fig2a_gam_wTC_woSol}
-
-# data_fit$prepost <- factor(data_fit$doy < 195)
-
-basic_gam_AR1 <- mgcv::gamm(
-  formula = value ~ s(dlnorm, by = site),
-  correlation = corAR1(form = ~ doy | site),
-  data = data_fit %>% dplyr::mutate(site = factor(site)),
-  method="REML")
-
-
-pred_gam_AR1 <- data.frame(
-  dlnorm = data_fit$dlnorm,
-  doy = data_fit$doy,
-  maxv = data_fit$maxv,
-  minv = data_fit$minv,
-  value = data_fit$value,
-  site = data_fit$site) %>%
-  mutate(pred = predict(basic_gam_AR1$gam, type="response",se.fit = FALSE)) %>%
-  group_by(doy, site) %>%
-  summarise(pred = mean(pred), dlnorm = mean(dlnorm))
-  
-ggplot() +
-  geom_point(
-    data = data_fit %>% mutate(dlnorm = ifelse(doy < 172, -1+dlnorm, 1-dlnorm)),
-    aes(x = doy, y = value), size = 0.1, alpha = 0.1) +
-  geom_line(
-    data = pred_gam %>% mutate(dlnorm = ifelse(doy < 172, -1+dlnorm, 1-dlnorm)),
-    aes(x = doy, y = pred), color = "white", linewidth = 0.7) +
-  geom_line(
-    data = pred_gam %>% mutate(dlnorm = ifelse(doy < 172, -1+dlnorm, 1-dlnorm)),
-    aes(x = doy, y = pred), color = "#0B3954", linewidth = 0.7) +
-  geom_line(
-    data = pred_gam_AR1 %>% mutate(dlnorm = ifelse(doy < 172, -1+dlnorm, 1-dlnorm)),
-    aes(x = doy, y = pred), color = "white", linewidth = 0.9) +
-  geom_line(
-    data = pred_gam_AR1 %>% mutate(dlnorm = ifelse(doy < 172, -1+dlnorm, 1-dlnorm)),
-    aes(x = doy, y = pred), color = "#A5151C", linewidth = 0.7) +
-  theme_bw() +
-  theme(legend.position = 'none',
-        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
-  labs(y = "Spearman corr.", x = "DOY") +
-  coord_cartesian(expand = FALSE) +
-  geom_vline(data = data.frame(doyp = c(106,228)), 
-             aes(xintercept = doyp), linetype = "dotted") 
-
-
-```
