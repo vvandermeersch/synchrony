@@ -1,0 +1,105 @@
+---
+title: "GDD related stuff"
+author: "Victor, Lizzie"
+date: "2024-08-26"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(terra) # process raster data
+library(dplyr)
+library(ggplot2)
+library(ggforce) # geom_link2 function
+library(scales) # date on x-axis
+library(mgcv) # gam
+
+wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
+
+# Data from Journe et al. 2024 ()
+## note that this is the filtered dataset used by V. Journe, we may want to start from scratch with raw MasTree data
+journe_d <- read.csv(file.path(wd, "data/journe2024", "mastree_subset_fagus.csv")) 
+
+```
+
+```{r gdd_classic}
+
+process_data <- readRDS(file.path(wd, "data/processed", "journe2024_replicate.rds"))
+
+gdd_data <- process_data %>%
+  dplyr::group_by(sitenewname, Year) %>%
+  dplyr::mutate(tmean_filt = ifelse(Tmean <= 35 & Tmean >=5, Tmean, 0),
+                gdd = cumsum(tmean_filt)) %>%
+  dplyr::select(-tmean_filt) %>%
+  ungroup() %>%
+  mutate(doy = as.numeric(strftime(Date, format = "%j")),
+         source = stringr::str_split(sitenewname, "_", simplify = T)[, 1])
+
+```
+
+```{r gdd_classicplot, fig.height = 13, fig.width = 10}
+
+gdd_data %>%
+  dplyr::group_by(source, sitenewname,doy) %>%
+  summarise(gddm = mean(gdd), sd = sd(gdd)) %>%
+  ggplot(aes(x = doy, y = gddm, group = sitenewname)) +
+  facet_wrap(~ source, ncol = 3) + 
+  geom_line() +
+  geom_ribbon(aes(ymin = gddm-sd, ymax = gddm+sd), alpha = 0.1) + 
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(y = "GDD", x = "DOY")+
+  geom_vline(xintercept = 172) +
+  coord_cartesian(xlim = c(0,365), expand = FALSE)
+
+```
+
+```{r gdd_classicplot_scaled, fig.height = 13, fig.width = 10}
+
+gdd_data %>%
+  dplyr::group_by(sitenewname) %>%
+  mutate(maxv = max(gdd), minv = min(gdd),
+         gdd_sc = (gdd-minv)/(maxv-minv)) %>%
+  dplyr::group_by(source,sitenewname,doy) %>%
+  summarise(gddm = mean(gdd_sc), sd = sd(gdd_sc)) %>%
+  ggplot(aes(x = doy, y = gddm, group = sitenewname)) +
+  facet_wrap(~ source, ncol = 3) + 
+  geom_line() +
+  geom_ribbon(aes(ymin = gddm-sd, ymax = gddm+sd), alpha = 0.1) + 
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(y = "GDD scaled", x = "DOY")+
+  geom_vline(xintercept = 172) +
+  coord_cartesian(xlim = c(0,365), expand = FALSE)
+
+```
+
+```{r gdd_global}
+
+gdd_data %>%
+  dplyr::group_by(sitenewname) %>%
+  mutate(maxv = max(gdd), minv = min(gdd),
+         gdd_sc = (gdd-minv)/(maxv-minv)) %>%
+  dplyr::group_by(source,sitenewname,doy) %>%
+  summarise(gddm = mean(gdd_sc), sd = sd(gdd_sc)) %>%
+  ggplot(aes(x = doy, y = gddm, group = sitenewname)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = gddm-sd, ymax = gddm+sd), alpha = 0.1) + 
+  stat_summary(aes(group=1), fun=mean, geom="line", colour="white", linewidth = 1.3) + 
+  stat_summary(aes(group=1), fun=mean, geom="line", colour="darkred", linewidth = 1) + 
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(y = "GDD scaled", x = "DOY")+
+  geom_vline(xintercept = 172) +
+  coord_cartesian(xlim = c(0,365), expand = FALSE)
+
+```
