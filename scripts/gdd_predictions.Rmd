@@ -325,3 +325,116 @@ ggplot(aes(x = day_sos, y = rsquared),
 
 ```
 
+### A different definition for SOS
+
+```{r compute_sos2}
+
+library("doFuture")
+registerDoFuture()
+plan(multisession, workers = 10)
+
+gdd_data2 <- foreach(s = unique(gdd_data$site), .combine = rbind) %dopar% {
+  
+  aux <- gdd_data[gdd_data$site == s,]
+
+  years <- unlist(unique(aux$year))
+  
+  for(y in years){
+    
+    fit.dat <- aux %>% dplyr::filter(year == y)
+    time <- fit.dat$doy
+    fit.lm <- lm(tmean ~ cos(2*pi*doy/max(time)) + sin(2*pi*doy/max(time)), data = fit.dat)
+    pred <- predict(fit.lm, newdata = list(doy = time))    
+    fderiv <- diff(pred)/diff(time)
+    
+    aux[aux$year == y, "sos_harmonic"] <- 
+      as.numeric(which(fderiv == max(fderiv)))
+  
+  }
+  
+  aux
+
+}
+plan(sequential)
+    
+gdd_data2 %>%
+  dplyr::select(site, latitude, sos, sos_harmonic, eos) %>%
+  unique() %>%
+  ggplot() +
+  geom_boxplot(aes(y = eos, x = site, fill = "#AC80A0", color = "#AC80A0"),
+               alpha = 0.5) +
+  geom_boxplot(aes(y = sos, x = site, fill = "#005f73", color = "#005f73"),
+               alpha = 0.5) +
+  geom_boxplot(aes(y = sos_harmonic, x = site, fill = "#AC80A0", color = "#AC80A0"),
+               alpha = 0.5) +
+  coord_cartesian(ylim = c(4,366), expand = FALSE, clip = "off") +
+  scale_y_continuous(breaks = seq(5,365,30)) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = 'none')
+
+
+```
+
+```{r gdd_pred3}
+
+days <- 1:200
+
+gdd_predpower <- foreach(s = unique(gdd_data2$site), .combine = rbind) %do% {
+  
+ pred_data <- gdd_data2 %>%
+    group_by(year) %>%
+    dplyr::filter(site == s) %>%
+    dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5 & 
+                                        doy >= sos_harmonic & doy <= eos, tmean, 0),
+                  gddw = cumsum(tmean_filt),
+                  gddtot = max(gdd))
+ 
+ r2 <- sapply(days, function(i){
+   fit <- lm(scale(gddtot) ~ scale(gddw), data = pred_data %>% dplyr::filter(doy - sos_harmonic == i))
+   summary(fit)$r.squared})
+ 
+ data.frame(site = s, day_sos = days, rsquared = r2)
+  
+}
+
+gdd_predpower %>%
+  group_by(day_sos) %>%
+  dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
+  ggplot(aes(x = day_sos, y = rsq)) +
+  geom_line(color = "darkblue") +
+  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "darkblue", alpha = 0.2) + 
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+
+
+
+```
+
+```{r gdd_pred_bysite3,  fig.height = 12, fig.width = 10}
+
+solstice_eos <- gdd_data %>%
+  dplyr::select(site, sos) %>%
+  unique() %>%
+  dplyr::mutate(source = stringr::str_split(site, "_", simplify = T)[, 1])
+
+
+ggplot(aes(x = day_sos, y = rsquared),
+      data = gdd_predpower %>% 
+        dplyr::mutate(source = stringr::str_split(site, "_", simplify = T)[, 1])) +
+  facet_wrap(~ source) +
+  geom_line(aes(group = site), color = "darkblue") +
+  geom_boxplot(aes(y = -0.05, x = 172-sos, group = 1), data = solstice_eos, width = 0.04) +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+
+
+
+```
