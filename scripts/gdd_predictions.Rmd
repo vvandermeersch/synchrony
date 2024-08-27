@@ -1,0 +1,185 @@
+---
+title: "GDD predictions"
+author: "Victor, Lizzie"
+date: "2024-08-26"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(terra) # process raster data
+library(dplyr)
+library(ggplot2)
+library(ggforce) # geom_link2 function
+library(scales) # date on x-axis
+library(mgcv) # gam
+
+wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
+
+# Data from Journe et al. 2024 ()
+## note that this is the filtered dataset used by V. Journe, we may want to start from scratch with raw MasTree data
+journe_d <- read.csv(file.path(wd, "data/journe2024", "mastree_subset_fagus.csv")) 
+
+```
+
+```{r gdd_classic}
+
+process_data <- readRDS(file.path(wd, "data/processed", "journe2024_replicate.rds"))
+
+datac <- 
+  data.frame(site = process_data$sitenewname,
+             latitude = process_data$Latitude,
+             year = process_data$Year,
+             date = process_data$Date,
+             tmean = process_data$Tmean)
+
+gdd_data <- datac %>%
+  dplyr::group_by(site, year) %>%
+  dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5, tmean, 0),
+                gdd = cumsum(tmean_filt)) %>%
+  dplyr::select(-tmean_filt) %>%
+  ungroup() %>%
+  mutate(doy = as.numeric(strftime(date, format = "%j")),
+         source = stringr::str_split(site, "_", simplify = T)[, 1])
+
+```
+
+## Start of season
+
+```{r compute_sos}
+
+gdd_data <- gdd_data %>%
+  dplyr::group_by(site, year) %>%
+  dplyr::mutate(ab5 = zoo::rollapplyr(as.numeric(tmean>=5), 5, sum, fill = 0),
+                sos = first(doy[ab5 == 5])) %>%
+  ungroup()
+
+# order according to latitude
+gdd_data$site <- factor(x = gdd_data$site, 
+                        levels = unique(gdd_data$site[order(gdd_data$latitude)]))
+
+
+
+```
+
+## End of season
+
+```{r example_eos1}
+
+ex_data <- gdd_data %>% 
+               filter(site == "6013_15_FAGSYL" & year == 1987)
+
+fit.lm <- lm(tmean ~ cos(2*pi*doy/365) + sin(2*pi*doy/365), data = ex_data)
+
+time <- 1:365
+pred <- predict(fit.lm, newdata = list(doy = time))    
+
+plot(tmean ~ doy, data = ex_data, 
+     xlim = c(1, 365), ylim = c(-30, 30))
+lines(pred ~ time, col = "blue")
+
+fderiv <- diff(pred)/diff(time)
+lines(fderiv*100 ~ time[2:365], col = "red")
+abline(v=as.numeric(which(fderiv == min(fderiv))), col="green")
+abline(v=unique(ex_data$sos), col="green")
+
+```
+
+```{r example_eos2}
+
+ex_data <- gdd_data %>% 
+               filter(site == "413_1_FAGSYL" & year == 2003)
+
+fit.lm <- lm(tmean ~ cos(2*pi*doy/365) + sin(2*pi*doy/365), data = ex_data)
+
+time <- 1:365
+pred <- predict(fit.lm, newdata = list(doy = time))    
+
+plot(tmean ~ doy, data = ex_data, 
+     xlim = c(1, 365), ylim = c(-30, 30))
+lines(pred ~ time, col = "blue")
+
+fderiv <- diff(pred)/diff(time)
+lines(fderiv*100 ~ time[2:365], col = "red")
+abline(v=as.numeric(which(fderiv == min(fderiv))), col="green")
+abline(v=unique(ex_data$sos), col="green")
+
+```
+
+```{r compute_eos}
+
+gdd_data$eos <- NA
+
+library("doFuture")
+registerDoFuture()
+plan(multisession, workers = 10)
+
+gdd_data <- foreach(s = unique(gdd_data$site), .combine = rbind) %dopar% {
+  
+  aux <- gdd_data[gdd_data$site == s,]
+
+  years <- unlist(unique(aux$year))
+  
+  for(y in years){
+    
+    fit.dat <- aux %>% dplyr::filter(year == y)
+    time <- fit.dat$doy
+    fit.lm <- lm(tmean ~ cos(2*pi*doy/max(time)) + sin(2*pi*doy/max(time)), data = fit.dat)
+    pred <- predict(fit.lm, newdata = list(doy = time))    
+    fderiv <- diff(pred)/diff(time)
+    
+    aux[aux$year == y, "eos"] <- 
+      as.numeric(which(fderiv == min(fderiv)))
+  
+  }
+  
+  aux
+
+}
+    
+gdd_data %>%
+  dplyr::select(site, latitude, sos, eos) %>%
+  unique() %>%
+  ggplot() +
+  geom_boxplot(aes(y = eos, x = site, fill = latitude, color = latitude),
+               alpha = 0.5) +
+  geom_boxplot(aes(y = sos, x = site, fill = latitude, color = latitude),
+               alpha = 0.5) +
+  coord_cartesian(ylim = c(4,366), expand = FALSE, clip = "off") +
+  scale_y_continuous(breaks = seq(5,365,30)) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = 'none')
+
+
+```
+
+
+```{r gdd_season,  fig.height = 13, fig.width = 10}
+
+    
+gdd_data %>%
+  group_by(site, year) %>%
+  dplyr::filter(doy >= sos & doy <= eos) %>%
+  dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5, tmean, 0),
+                gddw = cumsum(tmean_filt)) %>%
+  ggplot(aes(x = doy, y = gddw)) +
+  facet_wrap(~ site) +
+  # geom_line(aes(group = year)) +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  coord_cartesian(ylim = c(-120, 4500), xlim = c(0,365), expand = FALSE) +
+  geom_boxplot(aes(y = -50, x = sos), width = 95) +
+  geom_boxplot(aes(y = 4350, x = eos), width = 95)
+
+
+```
+
