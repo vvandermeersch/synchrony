@@ -219,7 +219,8 @@ gdd_predpower %>%
   theme(legend.position = 'none',
         strip.background = element_blank(),
         panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
-  coord_cartesian(ylim = c(0,0.3), expand = FALSE)
+  coord_cartesian(ylim = c(0,0.3), expand = FALSE) +
+  labs(x = "Days since SOS (degC def.)")
 
 
 
@@ -242,7 +243,8 @@ ggplot(aes(x = day_sos, y = rsquared),
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since SOS (degC def.)")
 
 
 
@@ -295,7 +297,8 @@ gdd_predpower2 %>%
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since SOS (degC def.)")
 
 ```
 
@@ -319,7 +322,8 @@ ggplot(aes(x = day_sos, y = rsquared),
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since SOS (degC def.)")
 
 
 
@@ -410,7 +414,8 @@ gdd_predpower %>%
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since SOS (harm. def.)")
 
 
 
@@ -418,8 +423,8 @@ gdd_predpower %>%
 
 ```{r gdd_pred_bysite3,  fig.height = 12, fig.width = 10}
 
-solstice_eos <- gdd_data %>%
-  dplyr::select(site, sos) %>%
+solstice_eos <- gdd_data2 %>%
+  dplyr::select(site, sos_harmonic) %>%
   unique() %>%
   dplyr::mutate(source = stringr::str_split(site, "_", simplify = T)[, 1])
 
@@ -429,12 +434,153 @@ ggplot(aes(x = day_sos, y = rsquared),
         dplyr::mutate(source = stringr::str_split(site, "_", simplify = T)[, 1])) +
   facet_wrap(~ source) +
   geom_line(aes(group = site), color = "darkblue") +
-  geom_boxplot(aes(y = -0.05, x = 172-sos, group = 1), data = solstice_eos, width = 0.04) +
+  geom_boxplot(aes(y = -0.05, x = 172-sos_harmonic, group = 1), data = solstice_eos, width = 0.04) +
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since SOS (harm. def.)")
 
 
+
+```
+
+### What if SOS = 1st Jan, ie tree accumulate memory anyway
+
+```{r gdd_pred4}
+
+days <- 1:365
+
+
+gdd_predpower <- foreach(s = unique(gdd_data2$site), .combine = rbind) %do% {
+  
+ pred_data <- gdd_data2 %>%
+    group_by(year) %>%
+    dplyr::filter(site == s) %>%
+    dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5 & 
+                                        doy >= 1 & doy <= eos, tmean, 0),
+                  gddw = cumsum(tmean_filt),
+                  gddtot = max(gdd))
+ 
+ r2 <- sapply(days, function(i){
+   fit <- lm(gddtot ~ gddw, data = pred_data %>% dplyr::filter(doy == i))
+   summary(fit)$r.squared})
+ 
+ data.frame(site = s, day_sos = days, rsquared = r2)
+  
+}
+
+gseason <- gdd_data2 %>%
+  dplyr::select(site, eos, sos, sos_harmonic) %>%
+  unique() %>%
+  dplyr::mutate(source = stringr::str_split(site, "_", simplify = T)[, 1])
+
+eos_med <- gseason %>%
+  summarise(eos = median(eos))
+
+gdd_predpower %>%
+  group_by(day_sos) %>%
+  dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
+  ggplot(aes(x = day_sos, y = rsq)) +
+  geom_line(color = "darkblue") +
+  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "darkblue", alpha = 0.2) + 
+  geom_boxplot(aes(y = -0.05, x = eos, group = 1), data = gseason, width = 0.04) +
+  geom_boxplot(aes(y = -0.05, x = sos, group = 1), data = gseason, width = 0.03) + 
+  geom_boxplot(aes(y = -0.02, x = sos_harmonic, group = 1), data = gseason, width = 0.03) + 
+  geom_vline(aes(xintercept = eos), linetype = "dashed", data = eos_med, color = "grey") +
+  geom_vline(xintercept = 172, linetype = "dotted") +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since 1st Jan")
+
+
+
+```
+
+```{r gdd_pred_bysite4,  fig.height = 12, fig.width = 10, eval = FALSE}
+
+
+
+eos_med <- gseason %>%
+  group_by(source) %>%
+  summarise(eos = median(eos))
+
+
+ggplot(aes(x = day_sos, y = rsquared),
+      data = gdd_predpower %>% 
+        dplyr::mutate(source = stringr::str_split(site, "_", simplify = T)[, 1])) +
+  facet_wrap(~ source) +
+  geom_line(aes(group = site), color = "darkblue") +
+  geom_vline(xintercept = 172, linetype = "dotted") +
+  geom_boxplot(aes(y = -0.05, x = sos, group = 1), data = gseason, width = 0.04) + 
+  geom_boxplot(aes(y = -0.05, x = eos, group = 1), data = gseason, width = 0.04) +
+  geom_vline(aes(xintercept = eos), linetype = "dashed", data = eos_med, color = "grey") +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since 1st Jan")
+
+```
+
+### SOS = 1st Jan + GDDtrend
+
+```{r gdd_pred5}
+
+days <- 7:365
+
+library("doFuture")
+registerDoFuture()
+plan(multisession, workers = 10)
+
+gdd_data$sos <- 0
+
+gdd_predpower2 <- foreach(s = unique(gdd_data$site), .combine = rbind) %dopar% {
+  
+ pred_data <- gdd_data %>%
+  group_by(year) %>%
+  dplyr::filter(site == s) %>%
+  dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5 & 
+                                      doy >= sos & doy <= eos, tmean, 0),
+                gddw = cumsum(tmean_filt),
+                gddtot = max(gdd),
+                doysos = doy - sos) %>%
+  ungroup() 
+ 
+ r2 <- sapply(days, function(i){
+   
+   fit <- lm(gddtot ~ gddw + diff, data = pred_data %>%
+               dplyr::filter(doysos %in% c(i, i-6)) %>%
+               dplyr::select(doysos, gddw, gddtot,sos,eos) %>%
+               mutate(doysos = ifelse(doysos==i, "gddw", "gddw_prev")) %>%
+               tidyr::pivot_wider(names_from = doysos, values_from = gddw) %>%
+               mutate(diff = gddw-gddw_prev))
+   summary(fit)$r.squared})
+ 
+ data.frame(site = s, day_sos = days, rsquared = r2)
+  
+}
+
+plan(sequential)
+
+eos_med <- gseason %>%
+  summarise(eos = median(eos))
+
+gdd_predpower2 %>%
+  group_by(day_sos) %>%
+  dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
+  ggplot(aes(x = day_sos, y = rsq)) +
+  geom_line(color = "darkblue") +
+  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "darkblue", alpha = 0.2) + 
+  geom_boxplot(aes(y = -0.05, x = eos, group = 1), data = gseason, width = 0.04) +
+  geom_vline(aes(xintercept = eos), linetype = "dashed", data = eos_med, color = "grey") +
+  geom_vline(xintercept = 172, linetype = "dotted") +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since 1st Jan")
 
 ```
