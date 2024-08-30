@@ -1,12 +1,12 @@
 ---
-title: "gdd_pareto"
+title: "Predictability, optimality"
 author: "Victor, Lizzie"
 date: "2024-08-28"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, dev = 'svg')
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, dev = 'svg', echo=FALSE)
 
 library(terra) # process raster data
 library(dplyr)
@@ -14,7 +14,10 @@ library(ggplot2)
 library(ggforce) # geom_link2 function
 library(scales) # date on x-axis
 library(mgcv) # gam
-library(doFuture)
+library(doFuture) # parallel loop
+library(cowplot)
+
+options(future.globals.maxSize = 8000 * 1024^2)
 
 set.seed(1997)
 
@@ -24,9 +27,9 @@ wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 ## note that this is the filtered dataset used by V. Journe, we may want to start from scratch with raw MasTree data
 journe_d <- read.csv(file.path(wd, "data/journe2024", "mastree_subset_fagus.csv")) 
 
-distance <- function(x, y) {sqrt((x - 1)^2 + (y - 1)^2)}
+pareto_dist <- function(x, y) {sqrt((x - 1)^2 + (y - 1)^2)}
 d <- expand.grid(x = seq(0, 1, 0.02), y = seq(0, 1, 0.02))
-d$dist <- mapply(distance, x = d$x, y = d$y)
+d$dist <- mapply(pareto_dist, x = d$x, y = d$y)
 
 ```
 
@@ -53,19 +56,20 @@ points(vect(sites,geom=c("x", "y")))
 
 rerun <- FALSE #switch
 
+years <- c(1981:2020)
+
 if(rerun){
   
-  years <- c(1981:2020)
   eobs_r <- subset(eobs_r, which(time(eobs_r, format = "years") %in% years))
 
   # get E-OBS daily temperature for each site in a loooong data.frame
-  sampled_sites <- terra::extract(eobs_r, vect(sites[1:20,],geom=c("x", "y")),
+  sampled_sites <- terra::extract(eobs_r, vect(sites,geom=c("x", "y")),
                         method = "simple", xy = TRUE) %>%
     as.data.frame() %>%
     tidyr::pivot_longer(cols = starts_with("tg"), names_to = NULL, values_to = "tmean")
   
-  sampled_sites$date <- rep(time(eobs_r), 20)
-  sampled_sites$year <- rep(time(eobs_r, format = "years"), 20)
+  sampled_sites$date <- rep(time(eobs_r), nrow(sites))
+  sampled_sites$year <- rep(time(eobs_r, format = "years"), nrow(sites))
   sampled_sites$doy <- as.numeric(strftime(sampled_sites$date, format = "%j"))
   
   saveRDS(sampled_sites, file = file.path(wd, "data/processed", "sampled_sites.rds"))
@@ -76,11 +80,19 @@ if(rerun){
   
 }
 
+# Some sites have some issues (some daily T are missing)
+sites_to_remove <- sampled_sites %>% 
+  filter(is.na(tmean)) %>% 
+  select(ID) %>%
+  unique() %>% unlist()
+
+sampled_sites <- sampled_sites %>% filter(!(ID %in% sites_to_remove))
+
 ```
 
-### Compute GDD (5-35degC range)
-
 ```{r gdd_classic}
+
+# Compute GDD (5-35degC range)
 
 sampled_sites <- sampled_sites %>%
   dplyr::group_by(ID, year) %>%
@@ -95,34 +107,46 @@ sampled_sites <- sampled_sites %>%
 
 ```{r gdd_pred}
 
+rerun <- FALSE #switch
+
 days <- 1:365
 
-registerDoFuture()
-plan(multisession, workers = 20)
-
-predictability <- foreach(s = unique(sampled_sites$ID), .combine = rbind) %do% {
+if(rerun){
   
- pred_data <- sampled_sites %>%
-   group_by(year) %>%
-   dplyr::filter(ID == s) %>%
-   mutate(gddtot = max(gdd))
- 
- r2 <- sapply(days, function(i){
-   fit <- lm(gddtot ~ gdd, data = pred_data %>% dplyr::filter(doy == i))
-   summary(fit)$r.squared})
- 
- data.frame(ID = s, doy = days, rsquared = r2)
+  registerDoFuture()
+  plan(multisession, workers = 20)
+
+  predictability <- foreach(s = unique(sampled_sites$ID), .combine = rbind) %dopar% {
+    
+   pred_data <- sampled_sites %>%
+     group_by(year) %>%
+     dplyr::filter(ID == s) %>%
+     mutate(gddmax = max(gdd))
+   
+   r2 <- sapply(days, function(i){
+     fit <- lm(gddmax ~ gdd, data = pred_data %>% dplyr::filter(doy == i))
+     summary(fit)$r.squared})
+   
+   data.frame(ID = s, doy = days, rsquared = r2)
+    
+  }
+  
+  plan(sequential)
+  
+  saveRDS(predictability, file = file.path(wd, "data/processed", "predictability_GDDmax.rds"))
+
+}else{
+  
+  predictability <- readRDS(file = file.path(wd, "data/processed", "predictability_GDDmax.rds"))
   
 }
-
-plan(sequential)
 
 predictability %>%
   group_by(doy) %>%
   dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
   ggplot(aes(x = doy, y = rsq)) +
-  geom_line(color = "darkblue") +
-  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "darkblue", alpha = 0.2) + 
+  geom_line(color = "#457b9d") +
+  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "#457b9d", alpha = 0.2) + 
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
@@ -131,7 +155,7 @@ predictability %>%
 
 ```
 
-```{r pareto}
+```{r pareto, fig.height = 5, fig.width = 10}
 
 remaining <- sampled_sites %>%
   group_by(ID, year) %>%
@@ -148,11 +172,11 @@ pareto_df <- remaining %>%
   group_by(doy) %>%
   summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) 
 
-ggplot() +
+pareto_front <- ggplot() +
   geom_raster(aes(x*max(pareto_df$gddrem), y, fill = dist), data = d, 
               interpolate = T, alpha = 1) +
   stat_contour(aes(x*max(pareto_df$gddrem), y, z = dist), data = d, 
-               col = 'black', linewidth = 0.1) +
+               col = 'white', linewidth = 0.3, linetype = "dotted") +
   scale_fill_distiller(type = "seq", direction = 1, palette = "Greys") +
   geom_line(aes(y = rsquared, x = gddrem), 
             data = pareto_df, 
@@ -173,33 +197,282 @@ ggplot() +
               ylim = c(0,1), expand = FALSE) +
   labs(y = "Predictability (R2)", x= "GDD remaining (over the year)")
 
+pareto_df$dist <- mapply(pareto_dist, x = pareto_df$rsquared, y = pareto_df$gddrem/max(pareto_df$gddrem))
+
+distance <- ggplot() +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "#457b9d", linewidth = 1) +
+  geom_segment(aes(x = 172, y = 0, xend = 172, yend = 1-dist),
+               data = pareto_df %>% filter(doy == 172),
+               color = "#c1121f", linetype = "dotted") +
+  geom_point(aes(y = 1-dist, x = doy), 
+             data = pareto_df %>% filter(doy == 172), 
+             size = 3.8, color = "#c1121f") +
+  geom_point(aes(y = 1-dist, x = doy), 
+             data = pareto_df %>% filter(doy == 172), 
+             size = 2.5, color = "white") +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        plot.margin = margin(l = 10)) +
+  coord_fixed(ratio = 365*2,
+              xlim = c(1, 365),
+              ylim = c(0,0.5), expand = FALSE) +
+  labs(y = "Optimality", x= "") +
+  scale_y_continuous(position = "right") +
+  scale_x_continuous(breaks = c(1,91,172,274,335), 
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Oct.\n", "Dec.\n"))
+
+plot_grid(pareto_front, distance, nrow = 1,
+          align = "hv", axis = "tblr")
+
 ```
 
-## Harmonic EOS
+### Sampling 36 sites (one random site at each latitude)
 
-```{r compute_eos, eval = FALSE}
+```{r pareto_nsamples, fig.height = 5, fig.width = 5}
 
-gdd_data$eos <- NA
 
-library("doFuture")
+set.seed(1995)
+sites_lat <- sampled_sites %>%
+  dplyr::select(ID, x, y) %>%
+  unique() %>%
+  group_by(y) %>%
+  slice_sample(n = 1)
+
+plot(subset(eobs_r,1) > -Inf, legend = FALSE)
+points(vect(sites_lat,geom=c("x", "y")))
+
+pareto_sites_df <- remaining %>%
+  left_join(predictability, by = c("ID", "doy")) %>%
+  dplyr::filter(ID %in% sites_lat$ID) %>%
+  group_by(ID, doy) %>%
+  summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) %>%
+  ungroup()%>%
+  group_by(ID) %>%
+  mutate(maxrem = max(gddrem))
+
+pareto_sites_df$dist <- mapply(pareto_dist, x = pareto_sites_df$rsquared, y = pareto_sites_df$gddrem/pareto_sites_df$maxrem)
+
+pareto_opts <- pareto_sites_df %>%
+  group_by(ID) %>%
+  dplyr::filter(dist == min(dist,na.rm = T)) 
+
+ggplot() +
+  geom_line(aes(y = 1-dist, x = doy, group = ID), 
+            data = pareto_sites_df, 
+            color = "#457b9d", linewidth = 0.5, alpha = 0.3) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "#457b9d", linewidth = 1) +
+  geom_point(aes(y = 1-dist, x = doy),
+             data = pareto_opts, size = 0.3,
+             color = "#c1121f") +
+  geom_boxplot(aes(y = 0.7, x = doy),
+               data = pareto_opts, width = 0.02,
+               color = "#c1121f", outlier.size=0.1) +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        plot.margin = margin(l = 10)) +
+  coord_fixed(ratio = 365*1.25,
+              xlim = c(1, 365),
+              ylim = c(0,.75), expand = FALSE) +
+  labs(y = "Optimality", x= "") +
+  scale_y_continuous(position = "left") +
+  scale_x_continuous(breaks = c(1,91,172,244,335), 
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
+
+```
+
+### All sites ?
+
+```{r pareto_allsite, fig.height = 5, fig.width = 5}
+
+pareto_sites_df <- remaining %>%
+  left_join(predictability, by = c("ID", "doy")) %>%
+  group_by(ID, doy) %>%
+  summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) %>%
+  ungroup()%>%
+  group_by(ID) %>%
+  mutate(maxrem = max(gddrem))
+
+pareto_sites_df$dist <- mapply(pareto_dist, x = pareto_sites_df$rsquared, y = pareto_sites_df$gddrem/pareto_sites_df$maxrem)
+
+pareto_opts <- pareto_sites_df %>%
+  group_by(ID) %>%
+  dplyr::filter(dist == min(dist,na.rm = T)) 
+
+ggplot() +
+  geom_line(aes(y = 1-dist, x = doy, group = ID), 
+            data = pareto_sites_df, 
+            color = "#457b9d", linewidth = 0.2, alpha = 0.1) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "#457b9d", linewidth = 1) +
+  geom_point(aes(y = 1-dist, x = doy),
+             data = pareto_opts, size = 0.2,
+             alpha = 0.5,
+             color = "#c1121f") +
+  geom_boxplot(aes(y = 0.82, x = doy),
+               data = pareto_opts, width = 0.02,
+               color = "#c1121f", outlier.size=0.1) +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        plot.margin = margin(l = 10)) +
+  coord_fixed(ratio = 365*1.15,
+              xlim = c(1, 365),
+              ylim = c(0,0.85), expand = FALSE) +
+  labs(y = "Optimality", x= "") +
+  scale_y_continuous(position = "left") +
+  scale_x_continuous(breaks = c(1,91,172,244,335), 
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
+
+
+sites_lat <- sampled_sites %>%
+  dplyr::select(ID, x, y) %>%
+  unique()
+
+fagus_distribution <- vect(file.path(wd, "data/distribution", "Fagus_sylvatica_sylvatica_plg_clip.shp"))
+eobs_grid <- subset(eobs_r,1) > -Inf
+
+valentin_sites <- unique(journe_d[c("Longitude", "Latitude")])
+
+ggplot(data = pareto_opts %>% left_join(sites_lat)) +
+    tidyterra::geom_spatraster(data = eobs_grid) +
+    scale_fill_manual(values = "#D0D9CD", na.value = NA, guide = 'none') +
+    ggnewscale::new_scale_fill() +
+    tidyterra::geom_spatvector(data = fagus_distribution, fill = "#A9BA9D") + 
+    geom_point(aes(x = x, y = y, fill = doy-172), color = "grey40", shape = 21, size = 2) +
+    geom_point(aes(x = Longitude, y = Latitude), data = valentin_sites, color = "black", 
+               shape = 4, size = 1.4, alpha = 0.7) +
+    scale_fill_gradient2() +
+    theme_void() +
+    theme(legend.position = "bottom") +
+    coord_sf(xlim = c(-11,40), ylim = c(36, 72))
+
+```
+
+### Only points in Fagus distribution ?
+
+```{r pareto_fagusdistribution, fig.height = 5, fig.width = 5}
+
+sites <- sites_lat %>% vect(geom = c("x","y"))
+sites_fagus <- mask(sites, fagus_distribution) %>% as.data.frame() %>% select(ID) %>% unlist()
+
+
+ggplot() +
+  geom_line(aes(y = 1-dist, x = doy, group = ID), 
+            data = pareto_sites_df %>% dplyr::filter(ID %in% sites_fagus), 
+            color = "#457b9d", linewidth = 0.2, alpha = 0.1) +
+  # geom_line(aes(y = 1-dist, x = doy), 
+  #           data = pareto_df, 
+  #           color = "white", linewidth = 1.5) +
+  # geom_line(aes(y = 1-dist, x = doy), 
+  #           data = pareto_df, 
+  #           color = "#457b9d", linewidth = 1) +
+  geom_point(aes(y = 1-dist, x = doy),
+             data = pareto_opts %>% dplyr::filter(ID %in% sites_fagus), size = 0.2,
+             alpha = 0.5,
+             color = "#c1121f") +
+  geom_boxplot(aes(y = 0.82, x = doy),
+               data = pareto_opts %>% dplyr::filter(ID %in% sites_fagus), width = 0.02,
+               color = "#c1121f", outlier.size=0.1) +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        plot.margin = margin(l = 10)) +
+  coord_fixed(ratio = 365*1.15,
+              xlim = c(1, 365),
+              ylim = c(0,0.85), expand = FALSE) +
+  labs(y = "Optimality", x= "") +
+  scale_y_continuous(position = "left") +
+  scale_x_continuous(breaks = c(1,91,172,244,335), 
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
+                     
+```
+
+### Only Valentin sites ?
+
+```{r pareto_valentin, fig.height = 5, fig.width = 5, eval = F}
+
+pareto_sites_df <- remaining %>%
+  left_join(predictability, by = c("ID", "doy")) %>%
+  group_by(ID, doy) %>%
+  summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) %>%
+  ungroup()%>%
+  group_by(ID) %>%
+  mutate(maxrem = max(gddrem))
+
+pareto_sites_df$dist <- mapply(pareto_dist, x = pareto_sites_df$rsquared, y = pareto_sites_df$gddrem/pareto_sites_df$maxrem)
+
+pareto_opts <- pareto_sites_df %>%
+  group_by(ID) %>%
+  dplyr::filter(dist == min(dist,na.rm = T)) 
+
+ggplot() +
+  geom_line(aes(y = 1-dist, x = doy, group = ID), 
+            data = pareto_sites_df, 
+            color = "#457b9d", linewidth = 0.2, alpha = 0.1) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = 1-dist, x = doy), 
+            data = pareto_df, 
+            color = "#457b9d", linewidth = 1) +
+  geom_point(aes(y = 1-dist, x = doy),
+             data = pareto_opts, size = 0.2,
+             alpha = 0.5,
+             color = "#c1121f") +
+  geom_boxplot(aes(y = 0.82, x = doy),
+               data = pareto_opts, width = 0.02,
+               color = "#c1121f", outlier.size=0.1) +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        plot.margin = margin(l = 10)) +
+  coord_fixed(ratio = 365*1.15,
+              xlim = c(1, 365),
+              ylim = c(0,0.85), expand = FALSE) +
+  labs(y = "Optimality", x= "") +
+  scale_y_continuous(position = "right") +
+  scale_x_continuous(breaks = c(1,91,172,244,335), 
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
+
+```
+
+### Compute harmonic SOS/EOS
+
+```{r compute_harmonicseason}
+
+sampled_sites$harm_sos <- NA
+sampled_sites$harm_eos <- NA
+
 registerDoFuture()
 plan(multisession, workers = 20)
 
-gdd_data <- foreach(s = unique(gdd_data$site), .combine = rbind) %dopar% {
+sampled_sites <- foreach(s = unique(sampled_sites$ID), .combine = rbind) %dopar% {
   
-  aux <- gdd_data[gdd_data$site == s,]
-
-  years <- unlist(unique(aux$year))
+  aux <- sampled_sites %>% dplyr::filter(ID == s)
   
-  for(y in years){
+  for(yr in years){
     
-    fit.dat <- aux %>% dplyr::filter(year == y)
+    fit.dat <- aux %>% dplyr::filter(year == yr)
     time <- fit.dat$doy
     fit.lm <- lm(tmean ~ cos(2*pi*doy/max(time)) + sin(2*pi*doy/max(time)), data = fit.dat)
     pred <- predict(fit.lm, newdata = list(doy = time))    
     fderiv <- diff(pred)/diff(time)
     
-    aux[aux$year == y, "eos"] <- 
+    aux[aux$year == yr, "harm_sos"] <- 
+      as.numeric(which(fderiv == max(fderiv)))
+    
+    aux[aux$year == yr, "harm_eos"] <- 
       as.numeric(which(fderiv == min(fderiv)))
   
   }
@@ -207,9 +480,222 @@ gdd_data <- foreach(s = unique(gdd_data$site), .combine = rbind) %dopar% {
   aux
 
 }
+
 plan(sequential)
 
+sampled_sites %>%
+  dplyr::select(ID, year, harm_sos) %>%
+  unique() %>%
+  ggplot() +
+  geom_line(aes(x=year,y=harm_sos,group=ID), alpha = 0.1, color = "#457b9d") +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Year", y = "Harmonic SOS") +
+  coord_cartesian(expand = FALSE)
+
 ```
+
+
+```{r gdd_harmonicseason}
+
+# Compute GDD (5-35degC range) during the (harmonic) season
+
+sampled_sites <- sampled_sites %>%
+  dplyr::group_by(ID, year) %>%
+  dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5 & 
+                                      doy >= harm_sos & doy <= harm_eos, tmean, 0),
+                harm_gdd = cumsum(tmean_filt)) %>%
+  dplyr::select(-tmean_filt) %>%
+  ungroup()
+
+```
+
+### Harmonic growing season ("predict GDDtot with GDDacc")
+
+```{r gdd_pred_harmonicseason}
+
+rerun <- TRUE #switch
+
+days <- 0:180
+
+if(rerun){
+  
+  registerDoFuture()
+  plan(multisession, workers = 20)
+
+  predictability <- foreach(s = unique(sampled_sites$ID), .combine = rbind) %dopar% {
+    
+   pred_data <- sampled_sites %>%
+     group_by(year) %>%
+     dplyr::filter(ID == s) %>%
+     mutate(gddtot = max(harm_gdd))
+   
+   r2 <- sapply(days, function(i){
+     fit <- lm(gddtot ~ harm_gdd, data = pred_data %>% dplyr::filter(doy - harm_sos == i))
+     summary(fit)$r.squared})
+   
+   data.frame(ID = s, days_since_sos = days, rsquared = r2)
+    
+  }
+  
+  plan(sequential)
+  
+  saveRDS(predictability, file = file.path(wd, "data/processed", "predictability_harm_GDDtot.rds"))
+
+}else{
+  
+  predictability <- readRDS(file = file.path(wd, "data/processed", "predictability_harm_GDDtot.rds"))
+  
+}
+
+predictability %>%
+  group_by(days_since_sos) %>%
+  dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
+  ggplot(aes(x = days_since_sos, y = rsq)) +
+  geom_line(color = "#457b9d") +
+  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "#457b9d", alpha = 0.2) + 
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Days since SOS")
+
+```
+
+```{r pareto_harmonicseaon, fig.height = 5, fig.width = 10}
+
+remaining <- sampled_sites %>%
+  group_by(ID, year) %>%
+  dplyr::mutate(gddtot = max(harm_gdd),
+                days_since_sos = doy - harm_sos) %>%
+  ungroup() %>%
+  group_by(ID,year,days_since_sos) %>%
+  dplyr::summarise(gddrem = gddtot - harm_gdd) %>%
+  ungroup() %>%
+  group_by(ID,days_since_sos) %>%
+  dplyr::summarise(gddrem = mean(gddrem))
+
+pareto_df <- remaining %>%
+  left_join(predictability, by = c("ID", "days_since_sos")) %>%
+  group_by(days_since_sos) %>%
+  summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) %>%
+  na.omit()
+
+solstice_df <- sampled_sites %>%
+  dplyr::select(ID, year, harm_sos) %>%
+  unique() %>%
+  mutate(days_to_sol = 172-harm_sos)
+
+solstice_summ <- solstice_df %>%
+  summarise(q25 = quantile(days_to_sol, 0.25), q75 = quantile(days_to_sol, 0.75))
+
+pareto_front <- ggplot() +
+  geom_raster(aes(x*max(pareto_df$gddrem), y, fill = dist), data = d, 
+              interpolate = T, alpha = 1) +
+  stat_contour(aes(x*max(pareto_df$gddrem), y, z = dist), data = d, 
+               col = 'white', linewidth = 0.3, linetype = "dotted") +
+  scale_fill_distiller(type = "seq", direction = 1, palette = "Greys") +
+  geom_line(aes(y = rsquared, x = gddrem), 
+            data = pareto_df, 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = rsquared, x = gddrem), 
+            data = pareto_df, 
+            color = "#457b9d", linewidth = 1) + 
+  geom_line(aes(y = rsquared, x = gddrem), 
+            data = pareto_df %>% filter(days_since_sos >= solstice_summ$q25 &
+                                          days_since_sos <= solstice_summ$q75), 
+            color = "#c1121f", linewidth = 1.2) + 
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank()) +
+  coord_fixed(ratio = max(pareto_df$gddrem),
+              xlim = c(0, max(pareto_df$gddrem)),
+              ylim = c(min(pareto_df$rsquared, na.rm = T),1), expand = FALSE) +
+  labs(y = "Predictability (R2)", x= "GDD remaining (over the year)")
+
+pareto_df$dist <- mapply(pareto_dist, x = pareto_df$rsquared, y = pareto_df$gddrem/max(pareto_df$gddrem))
+
+distance <- ggplot() +
+  geom_line(aes(y = 1-dist, x = days_since_sos), 
+            data = pareto_df, 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = 1-dist, x = days_since_sos), 
+            data = pareto_df, 
+            color = "#457b9d", linewidth = 1) +
+  geom_line(aes(y = 1-dist, x = days_since_sos), 
+            data = pareto_df %>% filter(days_since_sos >= solstice_summ$q25 &
+                                          days_since_sos <= solstice_summ$q75), 
+            color = "#c1121f", linewidth = 1.2) +
+  geom_segment(aes(x = solstice_summ$q25, y = 0.05, xend = solstice_summ$q25, yend = 1-dist),
+               data = pareto_df %>% filter(days_since_sos == solstice_summ$q25),
+               color = "#c1121f", linetype = "dotted") +
+  geom_segment(aes(x = solstice_summ$q75, y = 0.05, xend = solstice_summ$q75, yend = 1-dist),
+               data = pareto_df %>% filter(days_since_sos == solstice_summ$q75),
+               color = "#c1121f", linetype = "dotted") +
+  geom_boxplot(aes(y = 0.05, x = days_to_sol),
+               data = solstice_df, width = 0.02,
+               color = "#c1121f", outlier.size=0.1) +
+  # geom_point(aes(y = 1-dist, x = doy), 
+  #            data = pareto_df %>% filter(doy == 172), 
+  #            size = 3.8, color = "#c1121f") +
+  # geom_point(aes(y = 1-dist, x = doy), 
+  #            data = pareto_df %>% filter(doy == 172), 
+  #            size = 2.5, color = "white") +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        plot.margin = margin(l = 10)) +
+  coord_fixed(ratio = 180*2,
+              xlim = c(0, 180),
+              ylim = c(0,0.5), expand = FALSE) +
+  labs(y = "Optimality", x= "Days since SOS") +
+  scale_y_continuous(position = "right")
+
+plot_grid(pareto_front, distance, nrow = 1,
+          align = "hv", axis = "tblr")
+
+```
+
+### Compute "consecutive-temperature-based" SOS/EOS
+
+```{r compute_tempseason, eval = F}
+
+sampled_sites$temp_sos <- NA
+sampled_sites$temp_eos <- NA
+
+sampled_sites <- sampled_sites %>%
+  dplyr::group_by(ID, year) %>%
+  dplyr::mutate(consp5 = zoo::rollapplyr(as.numeric(tmean>=5), 5, sum, fill = 0),
+                temp_sos = first(doy[consp5 == 5]),
+                consn5 = zoo::rollapplyr(as.numeric(tmean<=5 & doy > temp_sos), 5, sum, fill = 0),
+                temp_eos = first(doy[consn5 == 5])) %>%
+  ungroup()
+
+# Some sites have some issues (our EOS rule cannot be applied, because not cold enough?)
+sites_noeos <- sampled_sites %>% 
+  filter(is.na(temp_eos)) %>% 
+  select(ID,x,y) %>%
+  unique()
+
+plot(subset(eobs_r,1) > -Inf, legend = FALSE)
+points(vect(sites_noeos,geom=c("x", "y")))
+
+sampled_sites %>%
+  dplyr::select(ID, year, harm_sos) %>%
+  unique() %>%
+  ggplot() +
+  geom_line(aes(x=year,y=harm_sos,group=ID), alpha = 0.1, color = "#457b9d") +
+  theme_bw() +
+  theme(legend.position = 'none',
+        strip.background = element_blank(),
+        panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  labs(x = "Year", y = "Harmonic SOS") +
+  coord_cartesian(expand = FALSE)
+
+```
+
+
+
 
 ```{r gdd_pred_eos, eval = FALSE}
 
@@ -239,8 +725,8 @@ gdd_predpower %>%
   group_by(doy) %>%
   dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
   ggplot(aes(x = doy, y = rsq)) +
-  geom_line(color = "darkblue") +
-  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "darkblue", alpha = 0.2) + 
+  geom_line(color = "#457b9d") +
+  geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "#457b9d", alpha = 0.2) + 
   theme_bw() +
   theme(legend.position = 'none',
         strip.background = element_blank(),
