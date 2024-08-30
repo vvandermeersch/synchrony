@@ -356,7 +356,10 @@ ggplot(data = pareto_opts %>% left_join(sites_lat)) +
                shape = 4, size = 1.4, alpha = 0.7) +
     scale_fill_gradient2() +
     theme_void() +
-    theme(legend.position = "bottom") +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.key.height = unit(0.2, "cm")) +
+    guides(fill=guide_colorbar(ticks.colour = NA)) +
     coord_sf(xlim = c(-11,40), ylim = c(36, 72))
 
 ```
@@ -401,51 +404,184 @@ ggplot() +
 
 ### Only Valentin sites ?
 
-```{r pareto_valentin, fig.height = 5, fig.width = 5, eval = F}
+```{r get_climate_vj}
 
-pareto_sites_df <- remaining %>%
-  left_join(predictability, by = c("ID", "doy")) %>%
+rerun <- FALSE #switch
+
+years <- c(1981:2020)
+
+if(rerun){
+  
+  eobs_r <- subset(eobs_r, which(time(eobs_r, format = "years") %in% years))
+
+  # get E-OBS daily temperature for each site in a loooong data.frame
+  sampled_sites_vj <- terra::extract(eobs_r, vect(valentin_sites,geom=c("Longitude", "Latitude")),
+                        method = "simple", xy = TRUE) %>%
+    as.data.frame() %>%
+    tidyr::pivot_longer(cols = starts_with("tg"), names_to = NULL, values_to = "tmean")
+  
+  sampled_sites_vj$date <- rep(time(eobs_r), nrow(valentin_sites))
+  sampled_sites_vj$year <- rep(time(eobs_r, format = "years"), nrow(valentin_sites))
+  sampled_sites_vj$doy <- as.numeric(strftime(sampled_sites_vj$date, format = "%j"))
+  
+  saveRDS(sampled_sites_vj, file = file.path(wd, "data/processed", "sampled_sites_vj.rds"))
+
+}else{
+  
+  sampled_sites_vj <- readRDS(file = file.path(wd, "data/processed", "sampled_sites_vj.rds"))
+  
+}
+
+```
+
+```{r gdd_classic_vj}
+
+# Compute GDD (5-35degC range)
+
+sampled_sites_vj <- sampled_sites_vj %>%
+  dplyr::group_by(ID, year) %>%
+  dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5, tmean, 0),
+                gdd = cumsum(tmean_filt)) %>%
+  dplyr::select(-tmean_filt) %>%
+  ungroup()
+
+```
+
+```{r gdd_pred_vj}
+
+rerun <- FALSE #switch
+
+days <- 1:365
+
+if(rerun){
+  
+  registerDoFuture()
+  plan(multisession, workers = 20)
+
+  predictability_vj <- foreach(s = unique(sampled_sites_vj$ID), .combine = rbind) %dopar% {
+    
+   pred_data <- sampled_sites_vj %>%
+     group_by(year) %>%
+     dplyr::filter(ID == s) %>%
+     mutate(gddmax = max(gdd))
+   
+   r2 <- sapply(days, function(i){
+     fit <- lm(gddmax ~ gdd, data = pred_data %>% dplyr::filter(doy == i))
+     summary(fit)$r.squared})
+   
+   data.frame(ID = s, doy = days, rsquared = r2)
+    
+  }
+  
+  plan(sequential)
+  
+  saveRDS(predictability_vj, file = file.path(wd, "data/processed", "predictability_GDDmax_vj.rds"))
+
+}else{
+  
+  predictability_vj <- readRDS(file = file.path(wd, "data/processed", "predictability_GDDmax_vj.rds"))
+  
+}
+
+# predictability_vj %>%
+#   group_by(doy) %>%
+#   dplyr::summarise(rsq = mean(rsquared), sd = sd(rsquared)) %>%
+#   ggplot(aes(x = doy, y = rsq)) +
+#   geom_line(color = "#457b9d") +
+#   geom_ribbon(aes(ymin = rsq-sd, ymax = rsq+sd), fill = "#457b9d", alpha = 0.2) + 
+#   theme_bw() +
+#   theme(legend.position = 'none',
+#         strip.background = element_blank(),
+#         panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+#   labs(x = "DOY")
+
+```
+
+```{r pareto_vj, fig.height = 5, fig.width = 5}
+
+remaining_vj <- sampled_sites_vj %>%
+  group_by(ID, year) %>%
+  dplyr::mutate(gddmax = max(gdd)) %>%
+  ungroup() %>%
+  group_by(ID,year,doy) %>%
+  dplyr::summarise(gddrem = gddmax - gdd) %>%
+  ungroup() %>%
+  group_by(ID,doy) %>%
+  dplyr::summarise(gddrem = mean(gddrem))
+
+pareto_vj_df <- remaining_vj %>%
+  left_join(predictability_vj, by = c("ID", "doy")) %>%
+  group_by(doy) %>%
+  summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) 
+
+pareto_vj_df$dist <- mapply(pareto_dist, x = pareto_vj_df$rsquared, y = pareto_vj_df$gddrem/max(pareto_vj_df$gddrem))
+
+pareto_sites_vj_df <- remaining_vj %>%
+  left_join(predictability_vj, by = c("ID", "doy")) %>%
   group_by(ID, doy) %>%
   summarise(rsquared = mean(rsquared), gddrem = mean(gddrem)) %>%
   ungroup()%>%
   group_by(ID) %>%
   mutate(maxrem = max(gddrem))
 
-pareto_sites_df$dist <- mapply(pareto_dist, x = pareto_sites_df$rsquared, y = pareto_sites_df$gddrem/pareto_sites_df$maxrem)
+pareto_sites_vj_df$dist <- mapply(pareto_dist, 
+                                  x = pareto_sites_vj_df$rsquared, 
+                                  y = pareto_sites_vj_df$gddrem/pareto_sites_vj_df$maxrem)
 
-pareto_opts <- pareto_sites_df %>%
+pareto_opts_vj <- pareto_sites_vj_df %>%
   group_by(ID) %>%
   dplyr::filter(dist == min(dist,na.rm = T)) 
 
 ggplot() +
+  geom_vline(xintercept = 172, color = "grey80", linetype = "dotted") + 
   geom_line(aes(y = 1-dist, x = doy, group = ID), 
-            data = pareto_sites_df, 
+            data = pareto_sites_vj_df, 
             color = "#457b9d", linewidth = 0.2, alpha = 0.1) +
   geom_line(aes(y = 1-dist, x = doy), 
-            data = pareto_df, 
+            data = pareto_vj_df, 
             color = "white", linewidth = 1.5) +
   geom_line(aes(y = 1-dist, x = doy), 
-            data = pareto_df, 
+            data = pareto_vj_df, 
             color = "#457b9d", linewidth = 1) +
   geom_point(aes(y = 1-dist, x = doy),
-             data = pareto_opts, size = 0.2,
+             data = pareto_opts_vj, size = 0.2,
              alpha = 0.5,
              color = "#c1121f") +
-  geom_boxplot(aes(y = 0.82, x = doy),
-               data = pareto_opts, width = 0.02,
+  geom_boxplot(aes(y = 0.72, x = doy),
+               data = pareto_opts_vj, width = 0.02,
                color = "#c1121f", outlier.size=0.1) +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(),
         plot.margin = margin(l = 10)) +
   coord_fixed(ratio = 365*1.15,
               xlim = c(1, 365),
-              ylim = c(0,0.85), expand = FALSE) +
+              ylim = c(0,0.75), expand = FALSE) +
   labs(y = "Optimality", x= "") +
-  scale_y_continuous(position = "right") +
+  scale_y_continuous(position = "left") +
   scale_x_continuous(breaks = c(1,91,172,244,335), 
                      labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
 
+sites_lat_vj <- sampled_sites_vj %>%
+  dplyr::select(ID, x, y) %>%
+  unique()
+
+ggplot(data = pareto_opts_vj %>% left_join(sites_lat_vj)) +
+    tidyterra::geom_spatraster(data = eobs_grid) +
+    scale_fill_manual(values = "#D0D9CD", na.value = NA, guide = 'none') +
+    ggnewscale::new_scale_fill() +
+    tidyterra::geom_spatvector(data = fagus_distribution, fill = "#A9BA9D") + 
+    geom_point(aes(x = x, y = y, fill = doy-172), color = "grey40", shape = 21, size = 2) +
+    scale_fill_gradient2() +
+    theme_void() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.key.height = unit(0.2, "cm")) +
+    guides(fill=guide_colorbar(ticks.colour = NA)) +
+    coord_sf(xlim = c(-11,40), ylim = c(36, 72))
+
+
 ```
+
 
 ### Compute harmonic SOS/EOS
 
