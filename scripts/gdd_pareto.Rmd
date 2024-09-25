@@ -2,7 +2,9 @@
 title: "Predictability, optimality"
 author: "Victor, Lizzie"
 date: "2024-08-28"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -33,7 +35,7 @@ d$dist <- mapply(pareto_dist, x = d$x, y = d$y)
 
 ```
 
-### Get E-OBS climate data for some sampled sites
+### Sample sites
 
 ```{r sample_sites}
 
@@ -52,11 +54,13 @@ points(vect(sites,geom=c("x", "y")))
 
 ```
 
-```{r get_climate}
+### 1951-1980
+
+```{r get_climate_5180}
 
 rerun <- FALSE #switch
 
-years <- c(1981:2020)
+years <- c(1951:1980)
 
 if(rerun){
   
@@ -72,11 +76,11 @@ if(rerun){
   sampled_sites$year <- rep(time(eobs_r, format = "years"), nrow(sites))
   sampled_sites$doy <- as.numeric(strftime(sampled_sites$date, format = "%j"))
   
-  saveRDS(sampled_sites, file = file.path(wd, "data/processed", "sampled_sites.rds"))
+  saveRDS(sampled_sites, file = file.path(wd, "data/processed", "sampled_sites_19511980.rds"))
 
 }else{
   
-  sampled_sites <- readRDS(file = file.path(wd, "data/processed", "sampled_sites.rds"))
+  sampled_sites <- readRDS(file = file.path(wd, "data/processed", "sampled_sites_19511980.rds"))
   
 }
 
@@ -90,7 +94,7 @@ sampled_sites <- sampled_sites %>% filter(!(ID %in% sites_to_remove))
 
 ```
 
-```{r gdd_classic}
+```{r gdd_classic_5180}
 
 # Compute GDD (5-35degC range)
 
@@ -103,9 +107,7 @@ sampled_sites <- sampled_sites %>%
 
 ```
 
-### No growing season defined ("predict GDDmax with GDD")
-
-```{r gdd_pred}
+```{r gdd_pred_5180}
 
 rerun <- FALSE #switch
 
@@ -133,11 +135,11 @@ if(rerun){
   
   plan(sequential)
   
-  saveRDS(predictability, file = file.path(wd, "data/processed", "predictability_GDDmax.rds"))
+  saveRDS(predictability, file = file.path(wd, "data/processed", "predictability_GDDmax_19511980.rds"))
 
 }else{
   
-  predictability <- readRDS(file = file.path(wd, "data/processed", "predictability_GDDmax.rds"))
+  predictability <- readRDS(file = file.path(wd, "data/processed", "predictability_GDDmax_19511980.rds"))
   
 }
 
@@ -155,7 +157,7 @@ predictability %>%
 
 ```
 
-```{r pareto, fig.height = 5, fig.width = 10}
+```{r pareto_5180, fig.height = 5, fig.width = 10}
 
 remaining <- sampled_sites %>%
   group_by(ID, year) %>%
@@ -184,18 +186,18 @@ pareto_front <- ggplot() +
   geom_line(aes(y = rsquared, x = gddrem), 
             data = pareto_df, 
             color = "#457b9d", linewidth = 1) + 
-  geom_point(aes(y = rsquared, x = gddrem), 
-             data = pareto_df %>% filter(doy == 172), 
-             size = 3.8, color = "#c1121f") +
-  geom_point(aes(y = rsquared, x = gddrem), 
-             data = pareto_df %>% filter(doy == 172), 
-             size = 2.5, color = "white") +
+  # geom_point(aes(y = rsquared, x = gddrem), 
+  #            data = pareto_df %>% filter(doy == 172), 
+  #            size = 3.8, color = "#c1121f") +
+  # geom_point(aes(y = rsquared, x = gddrem), 
+  #            data = pareto_df %>% filter(doy == 172), 
+  #            size = 2.5, color = "white") +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank()) +
   coord_fixed(ratio = max(pareto_df$gddrem),
               xlim = c(0, max(pareto_df$gddrem)),
               ylim = c(0,1), expand = FALSE) +
-  labs(y = "Predictability (R2)", x= "GDD remaining (over the year)")
+  labs(y = "Environmental predictability", x= "Growth potential (°C)")
 
 pareto_df$dist <- mapply(pareto_dist, x = pareto_df$rsquared, y = pareto_df$gddrem/max(pareto_df$gddrem))
 
@@ -211,29 +213,32 @@ distance <- ggplot() +
                color = "#c1121f", linetype = "dotted") +
   geom_point(aes(y = 1-dist, x = doy), 
              data = pareto_df %>% filter(doy == 172), 
-             size = 3.8, color = "#c1121f") +
+             size = 3, color = "#c1121f") +
   geom_point(aes(y = 1-dist, x = doy), 
              data = pareto_df %>% filter(doy == 172), 
-             size = 2.5, color = "white") +
+             size = 1.9, color = "white") +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(),
-        plot.margin = margin(l = 10)) +
+        plot.margin = margin(l = 0)) +
   coord_fixed(ratio = 365*2,
               xlim = c(1, 365),
               ylim = c(0,0.5), expand = FALSE) +
   labs(y = "Optimality", x= "") +
   scale_y_continuous(position = "right") +
   scale_x_continuous(breaks = c(1,91,172,274,335), 
-                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Oct.\n", "Dec.\n"))
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Oct.", "Dec.\n"))
 
-plot_grid(pareto_front, distance, nrow = 1,
+plot_5180 <- plot_grid(pareto_front, NULL, distance, nrow = 1,
+                  rel_widths = c(1, -0.1, 1),
           align = "hv", axis = "tblr")
+
+ggsave(plot_5180, filename = file.path("C:/Users/vandermeersch/Documents/CEFE/projects/synchrony", "plots", "gdd_optimum_5180.pdf"), width = 5.5, height = 2.5)
+
+plot_5180
 
 ```
 
-### Sampling 36 sites (one random site at each latitude)
-
-```{r pareto_nsamples, fig.height = 5, fig.width = 5}
+```{r pareto_nsamples, fig.height = 5, fig.width = 5, eval = F}
 
 
 set.seed(1995)
@@ -290,9 +295,7 @@ ggplot() +
 
 ```
 
-### All sites ?
-
-```{r pareto_allsite, fig.height = 5, fig.width = 5}
+```{r pareto_allsite, fig.height = 5, fig.width = 5, eval = T}
 
 pareto_sites_df <- remaining %>%
   left_join(predictability, by = c("ID", "doy")) %>%
@@ -364,9 +367,7 @@ ggplot(data = pareto_opts %>% left_join(sites_lat)) +
 
 ```
 
-### Only points in Fagus distribution ?
-
-```{r pareto_fagusdistribution, fig.height = 5, fig.width = 5}
+```{r pareto_fagusdistribution_5180, fig.height = 5, fig.width = 5, eval = T}
 
 sites <- sites_lat %>% vect(geom = c("x","y"))
 sites_fagus <- mask(sites, fagus_distribution) %>% as.data.frame() %>% select(ID) %>% unlist()
@@ -402,9 +403,14 @@ ggplot() +
                      
 ```
 
+
+
+
+
+
 ### Only Valentin sites ?
 
-```{r get_climate_vj}
+```{r get_climate_vj, eval = F}
 
 rerun <- FALSE #switch
 
@@ -434,7 +440,7 @@ if(rerun){
 
 ```
 
-```{r gdd_classic_vj}
+```{r gdd_classic_vj, eval = F}
 
 # Compute GDD (5-35degC range)
 
@@ -447,7 +453,7 @@ sampled_sites_vj <- sampled_sites_vj %>%
 
 ```
 
-```{r gdd_pred_vj}
+```{r gdd_pred_vj, eval = F}
 
 rerun <- FALSE #switch
 
@@ -497,7 +503,7 @@ if(rerun){
 
 ```
 
-```{r pareto_vj, fig.height = 5, fig.width = 5}
+```{r pareto_vj, fig.height = 5, fig.width = 5, eval = F}
 
 remaining_vj <- sampled_sites_vj %>%
   group_by(ID, year) %>%
@@ -585,7 +591,7 @@ ggplot(data = pareto_opts_vj %>% left_join(sites_lat_vj)) +
 
 ### Compute harmonic SOS/EOS
 
-```{r compute_harmonicseason}
+```{r compute_harmonicseason, eval = F}
 
 sampled_sites$harm_sos <- NA
 sampled_sites$harm_eos <- NA
@@ -634,7 +640,7 @@ sampled_sites %>%
 ```
 
 
-```{r gdd_harmonicseason}
+```{r gdd_harmonicseason, eval = F}
 
 # Compute GDD (5-35degC range) during the (harmonic) season
 
@@ -650,7 +656,7 @@ sampled_sites <- sampled_sites %>%
 
 ### Harmonic growing season ("predict GDDtot with GDDacc")
 
-```{r gdd_pred_harmonicseason}
+```{r gdd_pred_harmonicseason, eval = F}
 
 rerun <- TRUE #switch
 
@@ -700,7 +706,7 @@ predictability %>%
 
 ```
 
-```{r pareto_harmonicseaon, fig.height = 5, fig.width = 10}
+```{r pareto_harmonicseaon, fig.height = 5, fig.width = 10, eval = F}
 
 remaining <- sampled_sites %>%
   group_by(ID, year) %>%
