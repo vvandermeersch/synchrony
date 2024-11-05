@@ -3,7 +3,8 @@
 
 compute_optimality <- function(gdd, sites, ncores = 2){
   
-  i <- rep(1:31, each = 365)
+  nyr <- nlyr(gdd)/365
+  i <- rep(1:nyr, each = 365)
   gdd_tot <- tapp(gdd, i, fun=max) # calculate total GDD accumulated over the season
   
   gdd <- mask(gdd, sites)
@@ -39,7 +40,7 @@ compute_optimality <- function(gdd, sites, ncores = 2){
   # compute remaining GDD
   gdd_tot_rep <- rep(gdd_tot, each = 365)
   gdd_rem <- gdd_tot_rep - gdd
-  i <- rep(1:365, 31)
+  i <- rep(1:365, nyr)
   gdd_rem <- tapp(gdd_rem, i, fun=mean)
   
   # transform rasters to a data.frame (more convenient to plot results)
