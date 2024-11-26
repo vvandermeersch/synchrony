@@ -1,6 +1,6 @@
-#---------------------------------------------#
-# GDD optimum in historical conditions (EOBS) #
-#---------------------------------------------#
+#--------------------------------------#
+# GDD optimum in historical conditions #
+#--------------------------------------#
 
 wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 source(file.path(wd, "scripts", "preamble.R"))
@@ -9,17 +9,18 @@ source(file.path(wd, "scripts", "preamble.R"))
 tbase <- 5
 tupper <- 35
 
-# Load climate data (EOBS)
-eobs_r <- rast(file.path(wd, "data/eobs", "tg_ens_mean_0.1deg_reg_v29.0e.nc"))
-gc()
+# Directory where climate data are stored (ERA5-Land)
+data_dir <- "D:/climate/ERA5-Land/phenofit_format/transformed"
 
 # Compute GDD and optimality
 years <- c(1951:2020)
+period <- paste0(years[1],"_",years[length(years)])
 rerun <- TRUE # switch to avoid to recompute everything
 if(rerun){
   
   # sample sites
-  temp <- crop(subset(eobs_r,1), ext(c(-10.5, 34, 36, 71)))
+  file <- data.frame(fread(file.path(data_dir, paste0("ERA5LAND_tmp_",years[1],"_dly.fit"))))
+  temp <- rast(file[,c(2,1,3)])
   sites <- spatSample(temp, size = 800, "regular", ext = ext(c(-10.5, 34, 36, 71)),
                       cells=FALSE, xy=TRUE, values=FALSE, na.rm = TRUE, exhaustive = TRUE) %>% vect()
   
@@ -31,27 +32,33 @@ if(rerun){
   agf <- agf - 1
   rm(file, temp);gc()
   
-  gdd <- rast(lapply(years, function(yr){
-    tmean <- aggregate(mask(crop(subset(subset(eobs_r, which(time(eobs_r, format = "years") == yr)),1:365),
-                                 ext(c(-10.5, 34, 36, 71))), sites),agf,na.rm=TRUE)
+  plan(multisession, workers = 10)
+  .sites <- wrap(sites)
+  gdd <- future_lapply(years, function(yr){
+    cat(paste0(yr, "\n"))
+    sites <- unwrap(.sites)
+    file <- data.frame(fread(file.path(data_dir, paste0("ERA5LAND_tmp_",yr,"_dly.fit"))))
+    tmean <- rast(lapply(3:367, function(i) aggregate(mask(rast(file[,c(2,1,i)]), sites),agf,na.rm=TRUE)))
     tmean <- ifel(tmean < tbase, tbase, ifel(tmean > tupper, tupper, tmean)) # apply lower and upper bound
-    gdd <- cumsum(tmean-tbase)
+    gdd <- mask(cumsum(tmean-tbase),sites)
     time(gdd) <- 1:365
-    gdd
-  }))
+    cat(paste0(ext(gdd), "\n"))
+    wrap(gdd)
+  })
+  plan(sequential);gc()
+  gdd <- rast(lapply(gdd, rast))
   gc()
   
   #  Compute optimum
   optimality <- compute_optimality(gdd, ncores = 10)
-  optimality$period <- "1951_2020"
+  optimality$period <- period
   optimality$tbase <- tbase
   optimality$tupper <- tupper
   
-  saveRDS(optimality, file = file.path(wd, "data/processed/eobs", paste0("optimality_","1951_2020",".rds")))
+  saveRDS(optimality, file = file.path(wd, "data/processed/era5_land", paste0("optimality_",period,".rds")))
   
 }
-
-optimality_historical <- readRDS(file.path(wd, "data/processed/eobs", paste0("optimality_","1951_2020",".rds")))
+optimality_historical <- readRDS(file.path(wd, "data/processed/era5_land", paste0("optimality_","1951_2020",".rds")))
 
 global_optimum <- optimality_historical %>% 
   group_by(doy) %>%
@@ -89,3 +96,6 @@ optimum_plot <- ggplot() +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(global_optimum$opt), max(global_optimum$opt) +0.05), 
                   expand = FALSE)
+
+cowplot::ggsave2(filename = file.path(wd, "figures/supp", "optimality_historical_1950_2020.pdf"),
+                 plot = optimum_plot, device = cairo_pdf, width = 68, height = 58, unit = "mm")

@@ -1,14 +1,12 @@
 
 # function to compute GDD optimality
 
-compute_optimality <- function(gdd, sites, ncores = 2){
+compute_optimality <- function(gdd, ncores = 2){
   
   nyr <- nlyr(gdd)/365
   i <- rep(1:nyr, each = 365)
   gdd_tot <- tapp(gdd, i, fun=max) # calculate total GDD accumulated over the season
-  
-  gdd <- mask(gdd, sites)
-  gdd_tot <- mask(gdd_tot, sites)
+
   
   .gdd_tot <- wrap(gdd_tot) # make serializable raster
   .gdd <- wrap(gdd) # make serializable raster

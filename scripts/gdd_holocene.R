@@ -13,7 +13,7 @@ tupper <- 35
 # Directory where climate data are stored (from Van der Meersch et al. 2024)
 data_dir <- "D:/climate/HadCM3B_60Kyr_Climate/2023_dataset/phenofit_format/025deg"
 
-# Compute GDD for 5000BP
+# Compute GDD and optimality
 periods <- seq(2000,11000,3000)
 rerun <- TRUE # switch to avoid to recompute everything
 if(rerun){
@@ -49,7 +49,7 @@ local_optima <- optimality_holocene %>%
 
 global_optimum <- optimality_holocene %>% 
   group_by(period, doy) %>%
-  summarise(opt = median(opt)) %>%
+  summarise(opt = median(opt), env_pred = median(env_pred), growth_pot=median(growth_pot)) %>%
   mutate(q95 = quantile(opt, 0.95), opt_period = opt > q95)
 
 optimum_plot <- ggplot() +
