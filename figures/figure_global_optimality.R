@@ -1,7 +1,7 @@
 
-#-------------#
-# Main figure #
-#-------------#
+#---------------#
+# Main figure 1 #
+#---------------#
 
 library(patchwork)
 wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
