@@ -99,11 +99,10 @@ cowplot::ggsave2(filename = file.path(wd, "figures", "local_optimality_v2.pdf"),
                  plot = local_optima_plot, device = cairo_pdf, width = 80, height = 60, unit = "mm")
 
 
+
 sites$cluster <- local_clusters$cluster
-
-
 cluster_map <- ggplot() +
-  geom_raster(data = as.data.frame(temp, xy = TRUE),
+  geom_raster(data = as.data.frame(mask_r, xy = TRUE),
               aes(x,y), fill = "grey40") +
   geom_point(data = as.data.frame(sites, geom = "XY"), 
              aes(x, y),
@@ -116,4 +115,4 @@ cluster_map <- ggplot() +
 
 # Gather & save!
 cowplot::ggsave2(filename = file.path(wd, "figures", "local_optimality_wmap.pdf"),
-                 plot = local_optima_plot + cluster_map, device = cairo_pdf, width = 100, height = 60, unit = "mm")
+                 plot = local_optima_plot + cluster_map, device = cairo_pdf, width = 120, height = 60, unit = "mm")
