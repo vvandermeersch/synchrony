@@ -89,7 +89,7 @@ local_optima_plot <- ggplot() +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
-        plot.margin = margin(t = 0, b = 0, l = 5.7, r = 0)) +
+        plot.margin = margin(t = 0, b = 0, l = 2, r = 2)) +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(local_optima$opt), max(local_optima$opt) + 0.08), 
