@@ -97,3 +97,23 @@ local_optima_plot <- ggplot() +
 
 cowplot::ggsave2(filename = file.path(wd, "figures", "local_optimality_v2.pdf"),
                  plot = local_optima_plot, device = cairo_pdf, width = 80, height = 60, unit = "mm")
+
+
+sites$cluster <- local_clusters$cluster
+
+
+cluster_map <- ggplot() +
+  geom_raster(data = as.data.frame(temp, xy = TRUE),
+              aes(x,y), fill = "grey40") +
+  geom_point(data = as.data.frame(sites, geom = "XY"), 
+             aes(x, y),
+              color = "white", size = 0.8) +
+  geom_point(data = as.data.frame(sites, geom = "XY"), 
+             aes(x, y, color = as.character(cluster)),
+             size = 0.5) +
+  scale_color_manual(values = c("#1b9e77", "#d95f02", "#7570b3")) +
+  theme_void() + theme(legend.position = 'none')
+
+# Gather & save!
+cowplot::ggsave2(filename = file.path(wd, "figures", "local_optimality_wmap.pdf"),
+                 plot = local_optima_plot + cluster_map, device = cairo_pdf, width = 100, height = 60, unit = "mm")
