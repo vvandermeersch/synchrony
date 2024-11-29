@@ -73,7 +73,6 @@ local_optima_plot <- ggplot() +
                width = 0.06, 
                linewidth = 0.25, outliers = FALSE,
                data = local_optima %>% dplyr::filter(opt_period)) +
-  scale_y_continuous(position = "right") +
   geom_line(aes(y = opt, x = doy, color = as.character(cluster), 
                 group = id), alpha = 0.1, 
             data = local_optima, lineend = "round",
