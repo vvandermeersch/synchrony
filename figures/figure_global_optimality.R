@@ -50,7 +50,7 @@ pareto_front <- ggplot() +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
-        plot.margin = margin(t = 0, b = 0, l = 0, r = 5.7)) +
+        plot.margin = margin(t = 0, b = 0, l = 0, r = 6.5)) +
   coord_fixed(ratio = max_growth_pot,
               xlim = c(0, max_growth_pot),
               ylim = c(0,1), expand = FALSE) +
@@ -76,12 +76,12 @@ optimum_plot <- ggplot() +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
-        plot.margin = margin(t = 0, b = 0, l = 5.7, r = 0)) +
+        plot.margin = margin(t = 0, b = 0, l = 6.5, r = 0)) +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(global_optimum$opt), max(global_optimum$opt) + 0.06), 
                   expand = FALSE)
 
 # Gather & save!
-cowplot::ggsave2(filename = file.path(wd, "figures", "optimality.pdf"),
+cowplot::ggsave2(filename = file.path(wd, "figures", "global_optimality.pdf"),
                  plot = pareto_front + optimum_plot, device = cairo_pdf, width = 100, height = 60, unit = "mm")
