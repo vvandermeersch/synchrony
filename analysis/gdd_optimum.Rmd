@@ -97,7 +97,7 @@ sampled_sites <- sampled_sites %>%
   dplyr::mutate(tmean_filt = ifelse(tmean <= 35 & tmean >=5, tmean, 0),
                 gdd_5.35 = cumsum(tmean_filt),
                 tmean_filt = ifelse(tmean <= 40 & tmean >=0, tmean, 0),
-                gdd_0.40 = cumsum(tmean_filt),) %>%
+                gdd_0.40 = cumsum(tmean_filt)) %>%
   dplyr::select(-tmean_filt) %>%
   ungroup()
 
@@ -285,7 +285,7 @@ distance <- ggplot() +
              data = pareto_opts,
              size = 1.5, color = "white") +
   theme_bw() +
-  theme(panel.grid = element_blank(),
+  theme(panel.grid = element_blank(), legend.title = element_blank(), legend.position=c(.9,.9),
         plot.margin = margin(l = 0, r = 5.5, t = 5.5, b = 5.5), strip.background = element_blank()) +
   coord_fixed(ratio = 365*2,
               xlim = c(1, 365),
@@ -306,9 +306,76 @@ plot
 
 ```
 
-# Variation across sites
+```{r pareto_vertical, fig.height = 15, fig.width = 5}
 
-```{r pareto_allsite, fig.height = 15, fig.width = 15, eval = T}
+pareto_front <- ggplot() +
+  geom_raster(aes(x*3400, y, fill = dist), data = d,
+              interpolate = T, alpha = 1) +
+  stat_contour(aes(x*3400, y, z = dist), data = d,
+               col = 'white', linewidth = 0.3, linetype = "dotted") +
+  scale_fill_distiller(type = "seq", direction = 1, palette = "Greys") +
+  geom_line(aes(y = r2, x = gddrem, group = period), 
+            data = pareto_df %>% filter(def == "GDD_5.35" & period == "1991.2020"), 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = r2, x = gddrem, color = period), 
+            data = pareto_df %>% filter(def == "GDD_5.35" & period == "1991.2020"), linewidth = 1) + 
+  scale_x_continuous(position = "top") +
+  # geom_point(aes(y = rsquared, x = gddrem), 
+  #            data = pareto_df %>% filter(doy == 172), 
+  #            size = 3.8, color = "#c1121f") +
+  # geom_point(aes(y = rsquared, x = gddrem), 
+  #            data = pareto_df %>% filter(doy == 172), 
+  #            size = 2.5, color = "white") +
+  scale_color_manual(values = c("#457b9d", "#7b9d45")) +
+  theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
+        margin(l = 0, r = 0, t = 0, b =0)) +
+  coord_fixed(ratio = 3400,
+              xlim = c(0, 3400),
+              ylim = c(0,1), expand = FALSE) +
+  labs(y = "Environmental predictability", x= "Growth potential (°C)")
+
+distance <- ggplot() +
+  geom_line(aes(y = 1-dist, x = doy, group = period), 
+            data = pareto_df %>% filter(def == "GDD_5.35" & period == "1991.2020"), 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = 1-dist, x = doy, color = period), 
+            data = pareto_df %>% filter(def == "GDD_5.35" & period == "1991.2020"), linewidth = 1) +
+  scale_color_manual(values = c("#457b9d", "#7b9d45")) +
+  geom_segment(aes(x = 172, y = 0, xend = 172, yend = 1-dist),
+               data = pareto_df %>% filter(doy == 172) %>% filter(def == "GDD_5.35" & period == "1991.2020"),
+               color = "#c1121f", linetype = "dotted") +
+  geom_point(aes(y = 1-dist, x = doy),
+             data = pareto_opts %>% filter(def == "GDD_5.35" & period == "1991.2020"),
+             size = 2.5, color = "#c1121f") +
+  geom_point(aes(y = 1-dist, x = doy),
+             data = pareto_opts %>% filter(def == "GDD_5.35" & period == "1991.2020"),
+             size = 1.5, color = "white") +
+  theme_bw() +
+  theme(panel.grid = element_blank(), legend.title = element_blank(), legend.position = "none",
+        plot.margin = margin(l = 0, r = 0, t = 0, b =0), strip.background = element_blank()) +
+  coord_fixed(ratio = 365*2,
+              xlim = c(1, 365),
+              ylim = c(0,0.5), expand = FALSE) +
+  labs(y = "Optimality", x= "") +
+  scale_y_continuous(position = "left") +
+  scale_x_continuous(breaks = c(1,91,172,274,335), 
+                     labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Oct.", "Dec.\n"))
+
+plot <- plot_grid(pareto_front, NULL, distance, ncol = 1,
+                  rel_heights = c(1, -0.1, 1),
+          align = "hv", axis = "tblr")
+
+ggsave(plot, filename = file.path("C:/Users/vandermeersch/Documents/CEFE/projects/synchrony", "plots", "gdd_optimum_vertical.pdf"), width = 3, height = 5.5)
+
+plot
+
+
+```
+
+### Variation across sites
+
+```{r pareto_allsite, fig.height = 15, fig.width = 15, eval = F}
 
 pareto_sites_df <- rbind(remaining_1951.1980, remaining_1991.2020) %>%
   tidyr::pivot_longer(cols = c("gddrem_5.35", "gddrem_0.40"), values_to = c("gddrem"), names_to = "def") %>%
@@ -360,51 +427,68 @@ plot <- ggplot() +
                      labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
 
 ggsave(plot, filename = file.path("C:/Users/vandermeersch/Documents/CEFE/projects/synchrony", "plots", "gdd_optimum_bysites.pdf"), width = 10, height = 10)
- plot
 
-# sites_lat <- sampled_sites %>%
-#   dplyr::select(ID, x, y) %>%
-#   unique()
-# 
-# fagus_distribution <- vect(file.path(wd, "data/distribution", "Fagus_sylvatica_sylvatica_plg_clip.shp"))
-# eobs_grid <- subset(eobs_r,1) > -Inf
-# 
-# valentin_sites <- unique(journe_d[c("Longitude", "Latitude")])
-# 
-# ggplot(data = pareto_opts %>% left_join(sites_lat)) +
-#     tidyterra::geom_spatraster(data = eobs_grid) +
-#     scale_fill_manual(values = "#D0D9CD", na.value = NA, guide = 'none') +
-#     ggnewscale::new_scale_fill() +
-#     tidyterra::geom_spatvector(data = fagus_distribution, fill = "#A9BA9D") + 
-#     geom_point(aes(x = x, y = y, fill = doy-172), color = "grey40", shape = 21, size = 2) +
-#     geom_point(aes(x = Longitude, y = Latitude), data = valentin_sites, color = "black", 
-#                shape = 4, size = 1.4, alpha = 0.7) +
-#     scale_fill_gradient2() +
-#     theme_void() +
-#     theme(legend.position = "bottom",
-#           legend.title = element_blank(),
-#           legend.key.height = unit(0.2, "cm")) +
-#     guides(fill=guide_colorbar(ticks.colour = NA)) +
-#     coord_sf(xlim = c(-11,40), ylim = c(36, 72))
+plot
+
+
 
 ```
 
-```{r pareto_fagusdistribution_5180, fig.height = 5, fig.width = 5, eval = F}
+### Inside F. sylvatica range
+
+```{r fagusdistribution, fig.height = 10, fig.width = 10, eval = F}
+
+sites_lat <- sampled_sites %>%
+  dplyr::select(ID, x, y) %>%
+  unique()
+
+fagus_distribution <- vect(file.path(wd, "data/distribution", "Fagus_sylvatica_sylvatica_plg_clip.shp"))
+eobs_grid <- subset(eobs_r,1) > -Inf
+
+# valentin_sites <- unique(journe_d[c("Longitude", "Latitude")])
+
+plot <- ggplot(data = pareto_opts %>% filter(def == "GDD_5.35" & period == "1991.2020") %>% left_join(sites_lat)) +
+    tidyterra::geom_spatraster(data = eobs_grid) +
+    scale_fill_manual(values = "#D0D9CD", na.value = NA, guide = 'none') +
+    ggnewscale::new_scale_fill() +
+    tidyterra::geom_spatvector(data = fagus_distribution, fill = "#A9BA9D") +
+    geom_point(aes(x = x, y = y, fill = doy-172), color = "grey40", shape = 21, size = 2) +
+    # geom_point(aes(x = Longitude, y = Latitude), data = valentin_sites, color = "black",
+    #            shape = 4, size = 1.4, alpha = 0.7) +
+    scale_fill_gradient2() +
+    theme_void() +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.key.height = unit(0.2, "cm")) +
+    guides(fill=guide_colorbar(ticks.colour = NA)) +
+    coord_sf(xlim = c(-11,40), ylim = c(36, 72))
+
+ggsave(plot, filename = file.path("C:/Users/vandermeersch/Documents/CEFE/projects/synchrony", "plots", "europe_map.pdf"), 
+       width = 10, height = 10)
+
+plot
+
+```
+
+
+
+
+```{r pareto_fagusdistribution_5180, fig.height = 7, fig.width = 7, eval = F}
 
 sites <- sites_lat %>% vect(geom = c("x","y"))
 sites_fagus <- mask(sites, fagus_distribution) %>% as.data.frame() %>% select(ID) %>% unlist()
 
-
-ggplot() +
-  geom_line(aes(y = 1-dist, x = doy, group = ID), 
+plot <- ggplot() +
+  facet_grid(period ~ def) + 
+  geom_line(aes(y = 1-dist, x = doy, group = ID, color = period), 
             data = pareto_sites_df %>% dplyr::filter(ID %in% sites_fagus), 
-            color = "#457b9d", linewidth = 0.2, alpha = 0.1) +
+            linewidth = 0.2, alpha = 0.1) +
   # geom_line(aes(y = 1-dist, x = doy), 
   #           data = pareto_df, 
   #           color = "white", linewidth = 1.5) +
-  # geom_line(aes(y = 1-dist, x = doy), 
-  #           data = pareto_df, 
-  #           color = "#457b9d", linewidth = 1) +
+  # geom_line(aes(y = 1-dist, x = doy, color = period), 
+  #           data = pareto_sites_df %>% dplyr::filter(ID %in% sites_fagus), 
+  #           linewidth = 1) +
   geom_point(aes(y = 1-dist, x = doy),
              data = pareto_opts %>% dplyr::filter(ID %in% sites_fagus), size = 0.2,
              alpha = 0.5,
@@ -412,9 +496,10 @@ ggplot() +
   geom_boxplot(aes(y = 0.82, x = doy),
                data = pareto_opts %>% dplyr::filter(ID %in% sites_fagus), width = 0.02,
                color = "#c1121f", outlier.size=0.1) +
+  scale_color_manual(values = c("#457b9d", "#7b9d45")) +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(),
-        plot.margin = margin(l = 10)) +
+        plot.margin = margin(l = 10), strip.background = element_blank()) +
   coord_fixed(ratio = 365*1.15,
               xlim = c(1, 365),
               ylim = c(0,0.85), expand = FALSE) +
@@ -422,6 +507,10 @@ ggplot() +
   scale_y_continuous(position = "left") +
   scale_x_continuous(breaks = c(1,91,172,244,335), 
                      labels = c("Jan.\n", "Apr.", "Summer\nsolstice", "Sept.\n", "Dec.\n"))
+
+ggsave(plot, filename = file.path("C:/Users/vandermeersch/Documents/CEFE/projects/synchrony", "plots", "gdd_optimum_fagussylvatica.pdf"), width = 7, height = 7)
+
+plot
                      
 ```
 

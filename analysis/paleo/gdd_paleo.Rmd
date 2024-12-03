@@ -1,0 +1,80 @@
+---
+title: "GDD optimality"
+author: "Victor, Lizzie"
+date: "2024-09-24"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, dev = 'svg', echo=FALSE)
+
+library(terra) # process raster data
+library(dplyr)
+library(ggplot2)
+library(ggforce) # geom_link2 function
+library(scales) # date on x-axis
+library(mgcv) # gam
+library(doFuture) # parallel loop
+library(future.apply)
+library(cowplot)
+library(data.table)
+
+
+
+wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
+
+# Compute Euclidean distance
+pareto_dist <- function(x, y) {sqrt((x - 1)^2 + (y - 1)^2)}
+d <- expand.grid(x = seq(0, 1, 0.02), y = seq(0, 1, 0.02))
+d$dist <- mapply(pareto_dist, x = d$x, y = d$y)
+
+```
+
+### Compute GDD and predictability
+
+```{r gdd_5000BP}
+
+tbase <- 0
+tupper <- 35
+
+data_dir <- "D:/climate/HadCM3B_60Kyr_Climate/2023_dataset/phenofit_format/dscl_15min"
+
+period <- 5000
+
+gdd <- rast(lapply((period-15):(period+15), function(yr){
+  file <- data.frame(fread(file.path(data_dir, paste0(period, "BP"), paste0("hadCM3B_tmn_-",yr,"_dly.fit"))))
+  tmean <- rast(lapply(3:367, function(i) rast(file[,c(2,1,i)])))
+  tmean <- ifel(tmean < tbase, tbase, ifel(tmean > tupper, tupper, tmean)) # apply lower and upper bound
+  gdd <- cumsum(tmean-tbase)
+  time(gdd) <- 1:365
+  gdd
+}))
+
+# sample sites
+sites <- spatSample(subset(gdd,1), size = 1000, "regular", ext = ext(c(-14, 40, 34, 71)), 
+                    cells=FALSE, xy=TRUE, values=FALSE, na.rm = TRUE, exhaustive = TRUE) %>% vect()
+
+
+
+
+```
+
+```{r plot}
+
+data_plot %>% 
+  group_by(doy) %>%
+  summarise(opt = median(opt)) %>%
+  mutate(q95 = quantile(opt, 0.95), opt_period = opt > q95) %>%
+  ggplot() +
+  geom_line(aes(y = opt, x = doy), 
+            color = "white", linewidth = 1.5) +
+  geom_line(aes(y = opt, x = doy, color = opt_period, group = 1), 
+            linewidth = 1) +
+  scale_color_manual(values = c("#457b9d", "#c1121f")) +
+  geom_vline(xintercept = 172, linetype = "dashed", color = "grey50") +
+   theme_bw() +
+  theme(legend.position = 'none', panel.grid = element_blank()) 
+
+```
