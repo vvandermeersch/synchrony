@@ -5,19 +5,19 @@
 
 library(patchwork)
 wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
-# source(file.path(wd, "scripts", "preamble.R"))
+source(file.path(wd, "scripts", "preamble.R"))
 
 # Load data
-optimality <- readRDS(file.path(wd, "data/processed/eobs", paste0("optimality_","1951_2020",".rds")))
+optimality <- readRDS(file.path(wd, "data/processed/era5land", paste0("optimality3_","1951_2020",".rds")))
 local_optima <- optimality %>%
   group_by(id) %>%
   mutate(qt = quantile(opt, 0.95), opt_period = opt > qt)
-# sites <- readRDS(file.path(wd, "data/processed", "sites.rds"))
+sites <- readRDS(file.path(wd, "data/processed", "sites.rds"))
 
 # Clustering in 2 clusters
 local_clusters <- local_optima %>% 
   dplyr::filter(opt_period) %>%
-  group_by(id,x,y) %>%
+  group_by(id) %>%
   summarise(optdoy = median(doy))
 kmeans_cl <- kmeans(local_clusters$optdoy, centers = 3)
 local_clusters$cluster <- kmeans_cl$cluster
@@ -96,15 +96,18 @@ cowplot::ggsave2(filename = file.path(wd, "figures", "local_optimality_v2.pdf"),
 
 
 
-sites_clusters <- vect(local_clusters, geom = c("x", "y"))
-crs(sites_clusters) <- "EPSG:4326"
+sites <- as.data.frame(sites, geom = "XY") %>%
+  left_join(local_clusters, join_by(id)) %>%
+  vect(geom = c("x", "y"))
+crs(sites) <- "EPSG:4326"
+ 
 cluster_map <- ggplot() +
   geom_raster(data = as.data.frame(mask_r %>% project("EPSG:3035"), xy = TRUE),
               aes(x,y), fill = "grey45") +
-  geom_point(data = as.data.frame(sites_clusters %>% project("EPSG:3035"), geom = "XY"), 
+  geom_point(data = as.data.frame(sites %>% project("EPSG:3035"), geom = "XY"), 
              aes(x, y),
               color = "white", size = 0.6) +
-  geom_point(data = as.data.frame(sites_clusters %>% project("EPSG:3035"), geom = "XY"), 
+  geom_point(data = as.data.frame(sites %>% project("EPSG:3035"), geom = "XY"), 
              aes(x, y, color = as.character(cluster)),
              size = 0.3) +
   scale_color_manual(values = c("#1b9e77", "#d95f02", "#7570b3")) +
