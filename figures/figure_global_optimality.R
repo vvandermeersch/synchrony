@@ -8,7 +8,7 @@ wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 # source(file.path(wd, "scripts", "preamble.R"))
 
 # Load data
-optimality <- readRDS(file.path(wd, "data/processed/era5land", paste0("optimality_","1951_2020",".rds")))
+optimality <- readRDS(file.path(wd, "data/processed/era5land", paste0("optimality3_","1951_2020",".rds")))
 global_optimum <- optimality %>% 
   group_by(doy) %>%
   summarise(opt = mean(opt), growth_pot = mean(growth_pot), env_pred = mean(env_pred)) %>%

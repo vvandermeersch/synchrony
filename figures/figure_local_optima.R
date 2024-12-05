@@ -11,7 +11,7 @@ source(file.path(wd, "scripts", "preamble.R"))
 optimality <- readRDS(file.path(wd, "data/processed/era5land", paste0("optimality3_","1951_2020",".rds")))
 local_optima <- optimality %>%
   group_by(id) %>%
-  mutate(qt = quantile(opt, 0.95), opt_period = opt > qt)
+  mutate(qt = quantile(opt, 0.90), opt_period = opt > qt)
 sites <- readRDS(file.path(wd, "data/processed", "sites.rds"))
 
 # Clustering in 2 clusters
