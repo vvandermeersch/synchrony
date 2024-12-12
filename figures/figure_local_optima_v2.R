@@ -34,14 +34,25 @@ mask_r <-  readRDS(file = file.path(wd, "data/processed", "mask.rds"))
 local_optima_plot <- ggplot() +
   geom_vline(xintercept = 172, linetype = "dashed", 
              color = "grey70", linewidth = 0.3) +
-  geom_line(aes(y = opt, x = doy, group = id), 
-            color = "grey50", alpha = 0.1,
-            linewidth = 0.15,
+  geom_line(aes(y = opt, x = doy, group = id, color = deltaopt), 
+            alpha = 0.04,
+            linewidth = 0.2,
             data = local_optima) +
+  # geom_line(aes(y = opt, x = doy, group = id), 
+  #           color = "grey50", alpha = 0.1,
+  #           linewidth = 0.15,
+  #           data = local_optima) +
+  # geom_line(aes(y = opt, x = doy,
+  #               group = id, alpha = opt_period), 
+  #           data = local_optima, lineend = "round",
+  #           color = "white",
+  #           linewidth = 0.5) +
+  # scale_alpha_manual(values = c(0, 1)) +
+  # ggnewscale::new_scale("alpha") + 
   geom_line(aes(y = opt, x = doy, color = deltaopt, 
                 group = id, alpha = opt_period), 
             data = local_optima, lineend = "round",
-            linewidth = 0.2) +
+            linewidth = 0.1) +
   scale_alpha_manual(values = c(0, 1)) +
   scale_color_gradient2(low = "#d95f02", mid = "#1b9e77", high = "#7570b3",
                         breaks = seq(-20, 20, 20), 
@@ -114,17 +125,17 @@ zoom_two_sites <- ggplot(data = optimality_samples, aes(x = doy)) +
 map <- ggplot() +
   # tidyterra::geom_spatraster(data = mask_r %>% project("EPSG:3035")) +
   # scale_fill_gradient(low = "grey50", high = "grey45", na.value = "transparent", guide = FALSE) +
-  tidyterra::geom_spatvector(data = eu_map %>% crop(ext(mask_r)) %>% project("EPSG:3035"), fill = "white",
-                             linewidth = 0.1, color = "grey30") +
+  tidyterra::geom_spatvector(data = aggregate(eu_map) %>% crop(ext(mask_r)) %>% project("EPSG:3035"), fill = "white",
+                             linewidth = 0.1, color = "grey60") +
   tidyterra::geom_spatvector(data = sites %>% project("EPSG:3035"), 
                              color = "white", size = 1.1) +
   tidyterra::geom_spatvector(data = sites %>% project("EPSG:3035"), 
                              aes(color = deltaopt),
                              size = 0.7) +
   tidyterra::geom_spatvector(data = vect(c(south_pt, north_pt)) %>% project("EPSG:3035"), 
-                             color = "grey30", size = 1.5, shape = 15) +
+                             color = "grey30", size = 1.8, shape = 15) +
   tidyterra::geom_spatvector(data = vect(c(south_pt, north_pt)) %>% project("EPSG:3035"), 
-                             aes(color = deltaopt), size = 1, shape = 15) +
+                             aes(color = deltaopt), size = 1.2, shape = 15) +
   scale_color_gradient2(low = "#d95f02", mid = "#1b9e77", high = "#7570b3",
                         breaks = seq(-20, 20, 20), 
                         labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
@@ -151,30 +162,14 @@ design <-
    425
    425"
 
-test <- guide_area() + map +  plot_spacer() + local_optima_plot + zoom_two_sites +
+assemble_fig <- guide_area() + map +  plot_spacer() + local_optima_plot + zoom_two_sites +
   plot_layout(design = design, heights = c(0.25, 1, 0.1), widths = c(0.8, 1.2, 0.65)) + plot_layout(guides = "collect")
 
 
-cowplot::ggsave2(filename = file.path(wd, "figures", "test4.pdf"),
-                 plot = test, 
+cowplot::ggsave2(filename = file.path(wd, "figures", "test5.pdf"),
+                 plot = assemble_fig, 
                  device = cairo_pdf, width =  183, height = 80, unit = "mm")
 
 
-grid.newpage()
-grid.draw(test)
-grid.draw(linesGrob(x = unit(c(0.55, 0.75), "npc"), y = unit(c(0.63, 0.63), "npc")))
-upViewport()
-
-grid.draw() + grid.draw()
-
-compute_daylength <- function(doy, lat){
-  
-  p <- asin(0.39795 * cos(0.2163108 + 2 * atan(0.9671396 * tan(0.00860*(doy-186)))))
-  a <-  (sin(0.8333 * pi/180) + sin(lat * pi/180) * sin(p)) / (cos(lat * pi/180) * cos(p))
-  a <- min(max(a, -1), 1)
-  dl <- 24 - (24/pi) * acos(a)
-  
-  return(dl)
-}
 
 
