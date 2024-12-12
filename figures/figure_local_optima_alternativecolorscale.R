@@ -49,14 +49,18 @@ local_optima_plot <- ggplot() +
   #           linewidth = 0.5) +
   # scale_alpha_manual(values = c(0, 1)) +
   # ggnewscale::new_scale("alpha") + 
-geom_line(aes(y = opt, x = doy, color = deltaopt, 
+  geom_line(aes(y = opt, x = doy, color = deltaopt, 
               group = id, alpha = opt_period), 
           data = local_optima, lineend = "round",
           linewidth = 0.1) +
   scale_alpha_manual(values = c(0, 1)) +
-  scale_color_gradient2(low = "#d95f02", mid = "#1b9e77", high = "#7570b3",
-                        breaks = seq(-20, 20, 20), 
-                        labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20"))) +
+  scale_color_gradientn(colors = c("#803233FF", "#ED3F39FF", "#E46844FF", "#DC876CFF", "#ADD0B5FF", "#8FA3ABFF", "#484357FF", "#303638FF")) +
+  # scale_color_viridis_c(direction = -1, breaks = seq(-20, 20, 20), option = "D",
+  #                       labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
+  #                       name = "Optimal timing (relative to solstice)") +
+  # scale_color_gradient2(low = "#d95f02", mid = "#1b9e77", high = "#7570b3",
+  #                       breaks = seq(-20, 20, 20), 
+  #                       labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20"))) +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5, color = "grey20"), 
@@ -136,7 +140,10 @@ map <- ggplot() +
                              color = "grey30", size = 1.8, shape = 15) +
   tidyterra::geom_spatvector(data = vect(c(south_pt, north_pt)) %>% project("EPSG:3035"), 
                              aes(color = deltaopt), size = 1.2, shape = 15) +
-  scale_color_plasma_c(direction = -1) +
+  scale_color_gradientn(colors = c("#803233FF", "#ED3F39FF", "#E46844FF", "#DC876CFF", "#ADD0B5FF", "#8FA3ABFF", "#484357FF", "#303638FF")) +
+  # scale_color_viridis_c(direction = -1, breaks = seq(-20, 20, 20), option = "D",
+  #                      labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
+  #                      name = "Optimal timing (relative to solstice)") +
   # scale_color_gradient2(low = "#d95f02", mid = "#1b9e77", high = "#7570b3",
   #                       breaks = seq(-20, 20, 20), 
   #                       labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
@@ -157,6 +164,10 @@ map <- ggplot() +
                                          legend.key.width  = unit(80, "pt"),
                                          legend.text = element_text(size = 7, 
                                                                     margin = margin(t = 3.5), color = "grey20"))))
+
+cowplot::ggsave2(filename = file.path(wd, "figures", "map_kepler186.pdf"),
+                 plot = local_optima_plot + map + theme(legend.position = 'none'), 
+                 device = cairo_pdf, width =  120, height = 70, unit = "mm")
 
 design <-
   "123
