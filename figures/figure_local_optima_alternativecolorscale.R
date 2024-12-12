@@ -26,6 +26,9 @@ north_pt <- vect(sites_df[409,], geom = c("x", "y"))
 crs(south_pt) <- crs(north_pt) <- "EPSG:4326"
 mask_r <-  readRDS(file = file.path(wd, "data/processed", "mask.rds"))
 
+kippenberger <- c("#8B174DFF", "#AE2565FF", "#C1447EFF", "#D06C9BFF", "#DA9FB8FF", "#D9D2CCFF", 
+                  "#ADBE7CFF", "#8BA749FF", "#6E8537FF", "#4F5F28FF", "#343D1FFF")
+
 
 # ------------ #
 # Local optima #
@@ -54,7 +57,9 @@ local_optima_plot <- ggplot() +
           data = local_optima, lineend = "round",
           linewidth = 0.1) +
   scale_alpha_manual(values = c(0, 1)) +
-  scale_color_gradientn(colors = c("#803233FF", "#ED3F39FF", "#E46844FF", "#DC876CFF", "#ADD0B5FF", "#8FA3ABFF", "#484357FF", "#303638FF")) +
+  scale_color_gradientn(colors = kippenberger, breaks = seq(-20, 20, 20), 
+                        labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
+                        name = "Optimal timing (relative to solstice)") +
   # scale_color_viridis_c(direction = -1, breaks = seq(-20, 20, 20), option = "D",
   #                       labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
   #                       name = "Optimal timing (relative to solstice)") +
@@ -100,7 +105,7 @@ zoom_two_sites <- ggplot(data = optimality_samples, aes(x = doy)) +
   geom_line(aes(y = env_pred), 
             linewidth = 1.8, color = "white") +
   geom_line(aes(y = env_pred), 
-            linewidth = 0.6, color = "#048BA8") +
+            linewidth = 0.6, color = "#2565ae") +
   geom_line(aes(y = growth_pot_scaled), 
             linewidth = 1.8, color = "white") +
   geom_line(aes(y = growth_pot_scaled), 
@@ -117,7 +122,7 @@ zoom_two_sites <- ggplot(data = optimality_samples, aes(x = doy)) +
         panel.border=element_rect(color = "grey30"),
         axis.ticks = element_line(color = "grey30", linewidth = 0.3)) +
   labs(x = "DOY") +
-  scale_y_continuous("<span style='color:#048BA8;'>Env. predictability</span> / <span style='color:#e8a202;'>Growth potential (scaled)</span>", position = "right",  
+  scale_y_continuous("<span style='color:#2565ae;'>Env. predictability</span> / <span style='color:#e8a202;'>Growth potential (scaled)</span>", position = "right",  
                      breaks = c(0,0.25,0.5,0.75,1), labels = c("0", "", "0.5", "", "1")) +
   coord_cartesian(xlim = c(0,365), ylim = c(0,1.1), expand = FALSE)
 
@@ -140,7 +145,9 @@ map <- ggplot() +
                              color = "grey30", size = 1.8, shape = 15) +
   tidyterra::geom_spatvector(data = vect(c(south_pt, north_pt)) %>% project("EPSG:3035"), 
                              aes(color = deltaopt), size = 1.2, shape = 15) +
-  scale_color_gradientn(colors = c("#803233FF", "#ED3F39FF", "#E46844FF", "#DC876CFF", "#ADD0B5FF", "#8FA3ABFF", "#484357FF", "#303638FF")) +
+  scale_color_gradientn(colors = kippenberger, breaks = seq(-20, 20, 20), 
+                        labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
+                        name = "Optimal timing (relative to solstice)") +
   # scale_color_viridis_c(direction = -1, breaks = seq(-20, 20, 20), option = "D",
   #                      labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
   #                      name = "Optimal timing (relative to solstice)") +
@@ -164,10 +171,6 @@ map <- ggplot() +
                                          legend.key.width  = unit(80, "pt"),
                                          legend.text = element_text(size = 7, 
                                                                     margin = margin(t = 3.5), color = "grey20"))))
-
-cowplot::ggsave2(filename = file.path(wd, "figures", "map_kepler186.pdf"),
-                 plot = local_optima_plot + map + theme(legend.position = 'none'), 
-                 device = cairo_pdf, width =  120, height = 70, unit = "mm")
 
 design <-
   "123
