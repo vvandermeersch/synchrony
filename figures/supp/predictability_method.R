@@ -53,7 +53,7 @@ data_plot <- as.data.frame(do.call(rbind, data_plot))
 
 rsq <- data_plot %>%
   group_by(id,day) %>%
-  summarise(r2 = mean(r2), x = min(gdd_d)+0.15*(max(gdd_d)-min(gdd_d)), y = max(gdd_tot)-0.05*(max(gdd_tot)-min(gdd_tot)))
+  summarise(r2 = mean(r2), x = min(gdd_d)+0.15*(max(gdd_d)-min(gdd_d)), y = max(gdd_tot)-0.08*(max(gdd_tot)-min(gdd_tot)))
 
 site_names <- c(
   `1`="Northen site",
@@ -91,7 +91,8 @@ predictability_plot <- ggplot(data = optimality_samples, aes(x = doy)) +
         axis.ticks = element_line(color = "grey30", linewidth = 0.3)) +
   labs(x = "DOY", y = "Predictability") +
   coord_cartesian(xlim = c(0,365), ylim = c(0,1.1), expand = FALSE) +
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "top") +
+  scale_y_continuous(breaks = c(0,0.25,0.5,0.75,1), labels = c("0", "", "0.5", "", "1"))
 
 
 
@@ -99,7 +100,7 @@ day_example_plot <- ggplot(data = data_plot, aes(x = gdd_d, y = gdd_tot)) +
   ggh4x::facet_grid2(id ~ day, scales = "free", labeller = as_labeller(site_names), independent = "x")+
   
   # facet_grid(, scales = "free", )) +
-  geom_point(color = "#048BA8", alpha = 0.5)  +
+  geom_point(color = "#048BA8", alpha = 0.5, size = 1)  +
   geom_smooth(method = 'lm', se = FALSE, color = "#048BA8") +
   theme_bw() +
   theme_bw() +
@@ -120,9 +121,11 @@ design <-
   "123
    444"
 
-plot <- plot_spacer() + predictability_plot + plot_spacer() + day_example_plot +
-  plot_layout(design = design, widths = c(0.6, 1.2, 0.6))
+assemble_fig <- plot_spacer() + predictability_plot + plot_spacer() + day_example_plot +
+  plot_layout(design = design, widths = c(0.4, 1.4, 0.4))
 
-
+cowplot::ggsave2(filename = file.path(wd, "figures/supp", "predictability_method.pdf"),
+                 plot = assemble_fig, 
+                 device = cairo_pdf, width =  150, height = 120, unit = "mm")
 
 
