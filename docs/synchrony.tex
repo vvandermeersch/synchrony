@@ -10,6 +10,9 @@
 \usepackage[labelfont=bf]{caption}
 \bibliographystyle{amnat}
 
+\RequirePackage[labelfont={bf,sf},%
+                font={small, sf}]{caption}
+
 
 \title{Solstice optimizes thermal growing season}
 
@@ -30,7 +33,7 @@ Plants generally use environmental cues to adjust the timing of major growth and
 % Gao2024: "we do not know when plants start responding to temperatures, what range of temperatures influences spring phenology, and how and why these controls vary by species or climate conditions"
 
 Recently, summer solstice has been proposed as a universal trigger to modulate cues and initiate key physiological processes \citep{Zohner2023, Journe2024}---an idea that builds on earlier suggestions of solstice-driven control of tree growth \citep{Rossi2006}. This proposed photoperiod switch, if correct, could reshape predictions of forest responses to climate change. It would also suggest a fundamental new mechanism for how plants sense photoperiod \citep{Gendron2023}. 
-Using a fixed date like the solstice as a cue, however, could limit plasticity and become less suitable in a warmer future climate \citep{Bonamour2019}. %emw11Dec: I think Bonamour must say this also, and I am happy to avoid the self-citation. 
+Using a fixed date like the solstice as a cue, however, could limit plasticity and become less suitable in a warmer future climate \citep{Bonamour2019}. 
 This may in turn drive forest declines, with significant implications for carbon storage \citep{green2022limits}, and thus raises important questions about the suitability for plants to rely on the solstice. 
 
 % \item Plants need to balance transition to events at best moment vs end-of-season constraint, i.e. choose when to transition without full info\\
@@ -42,17 +45,17 @@ The timing of major plant transitions---such as start of growth with leafout---s
 %Plants want to grow as much as possible during warm years, and benefit from warm years to set many flowers (flower differentiation?)
 In particular, it is well established that plants respond primarily to integrated climate forcing, often measured as the accumulation of warm temperatures, in a given range---where metabolism is sufficient---and over a given period \citep[growing degree-days or GDD;][]{Chuine2017}. %emw11Dec: I would give a citation for GDD or -- if Isabelle's 2017 paper uses this term -- then just move the citation down to end of sentence. 
 % vvdm12Dec: Isabelle uses the terms "degree-day sum", "degree-day accumulation", "growing degree-day model"... So I think we're fine!
-This heat accumulation is a key factor in development and growth processes of both crops \citep[e.g.][]{Cross1972} and wild plants \citep[e.g.][]{Hunter1992}. The number of GDD accumulated throughout the season directly impacts how quickly cells elongate to form new organs and how quickly a plant progresses through growth stages. Plants are thus expected to take full advantage of warmer years (with a high GDD accumulation) to maximize growth and set more flowers for the following season. %emw11Dec: Would be nice to have a classic citation for this! I suspect Larcher's plant phys book says it or Isabelle or you may have better ideas. 
+This heat accumulation is a key factor in development and growth processes of both crops \citep[e.g.][]{Cross1972} and wild plants \citep[e.g.][]{Hunter1992}. The number of GDD accumulated throughout the season directly impacts how quickly cells elongate to form new organs and how quickly a plant progresses through growth stages. Plants are thus expected to take full advantage of warmer years (with a high GDD accumulation) to maximize growth and set more flowers for the following season \textbf{(REF)}. %emw11Dec: Would be nice to have a classic citation for this! I suspect Larcher's plant phys book says it or Isabelle or you may have better ideas. 
 
 % \item Given $GDD$ is so important, plants should thus transition into events when they can best predict $GDD_{total}$ within growing season -- while still having enough time/energy \emph{to do what they need to do}
-Given the importance of GDD, plants should ideally time their transitions when their ability to predict the total GDD within the growing season is high while still having enough potential thermal energy to complete essential growth and reproductive processes. This trade-off means that there should be an optimal period when plants have accumulated enough GDD to reliably predict the total GDD by the end of the year---\emph{environmental predictability}, while enough GDD still remains---which we call \emph{growth potential}. Here, we define environmental predictability based on how well GDD accumulated by a day ($d$) predicts the total GDD each year (measured as the $R^2$ of a linear regression across years using 1 January to start accumulation) and growth potential as remaining GDD on day $d$ (supp Fig). %emw11Dec: please check if my edits still present this correctly ... 
-This simple definition allows us to examine which window in the season appears optimal for plants to maximize growth and development while minimizing risks. %emw11Dec: Where we explain the method in the supp we should acknowledge in one sentence that OTHER trade-offs could be selected (e.g., not remaining GDD for the growth potential or something else) but this seems the most obvious or such (try to think of better adjective!).  
+Given the importance of GDD, plants should ideally time their transitions when their ability to predict the total GDD within the growing season is high while still having enough potential thermal energy to complete essential growth and reproductive processes. This trade-off means that there should be an optimal period when plants have accumulated enough GDD to reliably predict the total GDD by the end of the year---\emph{environmental predictability}, while enough GDD still remains---which we call \emph{growth potential}. Here, we define environmental predictability based on how well GDD accumulated by a day ($d$) predicts the total GDD each year (measured as the $R^2$ of a linear regression across years using 1 January to start accumulation) and growth potential as remaining GDD on day $d$ (see Supplementary methods and Supplementary Figure S1). %emw11Dec: please check if my edits still present this correctly ... 
+This simple definition allows us to examine which window in the season appears optimal for plants to maximize growth and development while minimizing risks.
 
 \begin{figure}[h]
 \centering
 \includegraphics{global_optimality.pdf}
 \vspace*{-0.7cm}
-\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe (1951-2020).} In the left panel, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In the right panel, optimality is computed as the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the blue curves represent days where optimality falls within the 90th percentile.} %emw11Dec: Be sure this caption (1) very briefly gives the method and (2) stresses this as averaged (while the next shows the variability). 
+\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe (1951-2020).} In the left panel, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In the right panel, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the blue curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days).} 
 \label{fig:globaloptimality}
 \end{figure}
 
@@ -63,28 +66,30 @@ This simple definition allows us to examine which window in the season appears o
 % \end{enumerate}
 %emw11Dec: Maybe something other than 'globally' given the analysis focuses on Europe? Or just delete it (as I have for now) and make sure the figure caption is clear. You could also remove 'in Europe' from the first sentence and add 'Averaging across all of Europe,' to the second sentence.
 We found the optimal period to be near the summer solstice (\Cref{fig:globaloptimality}). Averaging across all of Europe, solstice appears as a critical juncture for the optimization of both environmental predictability and growth potential.
-If this specific day indeed represents a broad-scale optimum across different climatic conditions, plant evolution towards a universal solstice trigger could make sense---especially since this optimum appears stable over the Holocene (supp Fig). %emw11Dec: Nice additional analysis!
+If this specific day indeed represents a broad-scale optimum across different climatic conditions, plant evolution towards a universal solstice trigger could make sense---especially since this optimum appears stable over the Holocene (Supplementary Figure S2). %emw11Dec: Nice additional analysis!
 % It could act as a reliable marker for when a plant has likely accumulated the right amount of GDD. 
 %emw11Dec: I don't love 'the right amount' ... we could maybe delete the sentence or change to: It could thus act as a reliable marker of each year's expected GDD before too late in the season. OR ... start a new paragraph as I suggest here ...
 % Our results also suggest it is challenging to disentangle the influence of the solstice from that of a thermal optimum cue.
 
-Our results suggest solstice could act as a reliable marker but also highlight that it is challenging to disentangle the influence of the solstice from that of a thermal optimum cue. %emw11Dec: We may need to spell this out more clearly than your sentence does? We show that solstice trades-off environmental predictability and growth potential, but given our metrics are based on a thermal season, plants could equally use thermal cues for the same outcome (though not clear to me how exactly -- is the GDD on that day stable enough to just track the total GDD perhaps?) ... 
+Our results suggest solstice could act as a reliable marker but also highlight that it is challenging to disentangle the influence of the solstice from that of a thermal optimum cue. %emw11Dec: We may need to spell this out more clearly than your sentence does? 
+We show that solstice trades-off environmental predictability and growth potential, but given our metrics are based on a thermal season, plants may equally use thermal cues for the same outcome.
 % does solstice coincide with the period of highest thermal energy in temperate regions? Peak of daily GDD is rather after solstice...
-This could indicate that plants rely on a combination of both solstice and thermal cues to optimize growth and reproductive timing. 
-%emw11Dec: Not sure I get the coincidence point below ... can you explain it to me so we can add it in better? (Maybe: a climatological average outcome? Or a climatological reality of seasonal progression or such...)  If not, we could just delete it and leave: However, it would be costly for plants to closely track two different signals---i.e. to encode and decode both thermal and photoperiod information within their cells. But I think you mean something important and it would help the flow of the manuscript if I understood it better. 
-Alternatively, this overlap could simply be a coincidence, since it would be costly for plants to closely track two different signals---i.e. to encode and decode both thermal and photoperiod information within their cells. 
+Plants could also rely on a combination of both solstice and thermal cues to optimize growth and reproductive timing---which could provide greater signal robustness to environmental change through partial redundancy between cues \citep{Bonamour2019}.
+Alternatively, this overlap could simply represent an emergent property of the climate system that plants don't necessarily use as a cue, since it would be costly for plants to closely track two different signals---i.e. to encode and decode both thermal and daylength information within their cells. 
 
 % \item Supporting this we found important variation over space (and time?)
 %emw11Dec: I don't think cautionary is what we want ... depends on what you mean above. (If we need to toss the coincidence point above then I think we need to set up more in the end of the previous paragraph how this evolution would happen -- and at what scales perhaps.)
-Supporting this "cautionary" hypothesis, our results reveal substantial variation in the optimal timing across Europe (\Cref{fig:localoptimality}). In warmer southern Europe, plants reach an optimum earlier in the season, whereas in northern regions, cooler temperatures delay this timing beyond the solstice. 
+Supporting the hypothesis of an alternative cue to the solstice, our results reveal substantial variation in the optimal timing across Europe (\Cref{fig:localoptimality}). In warmer southern Europe, plants reach an optimum earlier in the season, whereas in northern regions, cooler temperatures delay this timing beyond the solstice. 
 This regional variability suggests that plants should likely 
 %be partially adapted to their local climates---and especially to how GDD accumulate in their specific environment 
 rely on cues that allow for a plastic response in their specific environment. 
-From a parsimonious perspective, tracking primarily GDD might be more straightforward and aligned directly with the actual energy a plant needs to grow and reproduce. % (= directly linked to metabolic processes)
+From a parsimonious perspective, tracking primarily GDD-related cue might be more straightforward and aligned with the actual energy a plant needs to grow and reproduce---i.e. the cue would be sampled from a variable directly used by the plant.
+ % (= directly linked to metabolic processes) i.e. the cue is sampled from a variable directly use by the plant
 %emw11Dec: Recommend with stick with photoperiod or daylength across whole paper unless we're making an important distinction. 
 Whereas tracking the solstice is likely more complex. Indeed, plants would need to sense not just the daylength but also the variation in the rate of change of day length over time---essentially, the second derivative.
 % more directly beneficial for the plant?
-% What would be the benefit to have a separate mechanism, with the risk of a potential redundancy of tracking both the solstice and thermal cues? (but which thermal cue to track the optimal period?)
+% What would be the benefit to have a separate mechanism, with the risk of a potential redundancy of tracking both the solstice and thermal cues? (but which thermal cue to track the optimal period?) => increase robustness of the signal with  partial redundancy bewteen cues
+
 
 % Maybe we need to talk more about photoperiod cue sensing? What is known ("not a new result" Isabelle...) => make a paragraph?
 % second derivative sensing seems unlikely, but we know photoperiod can be important?
@@ -92,6 +97,7 @@ Whereas tracking the solstice is likely more complex. Indeed, plants would need 
 % if plants don't use solstice or if they don't use photoperiod, which cue(s) they need to track to understand that it is the optimal period, ? Temperature (and daily GDD accumulation) peaks after the optimum, so it should be something else?
 % Does using solstice will prevent adaptative plasticity in future climate, ie plants could be "locked in a solstice response" (and mention supp figure with CMIP6 projections?)
 % + "photosynthetic capacity peaks just after summer solstice and declines with decreasing photoperiod, before air temperatures peak" https://www.pnas.org/doi/10.1073/pnas.1119131109#fig02
+% "In the most extreme cases, a new environment is generating a signal similar to a previously known cue, but completely uncorrelated with both the original cue and the environment of selection."
 
 
 % \begin{enumerate}
@@ -100,6 +106,8 @@ Whereas tracking the solstice is likely more complex. Indeed, plants would need 
 % \end{enumerate}
 Disentangling the role of the solstice as a cue for major growth and reproductive transitions is challenging, as plants have already started accumulating GDD several months before the solstice.
 Complex natural correlations in environmental data may generate spurious results \citep[e.g.][]{Gao2024}, challenging us to test predictions from multiple avenues. % "inherent correlations in climate in regions that the field does not fully understand/incorporate"
+Future research should explore which thermal cues might allow plants to track the optimal period, and whereas they remain reliable in future climates (Supplementary Figure S3).
+% as daily GDD accumulation peak after solstice suggests the need for an alternative cue...?
 To address this requires carefully designed experiments that decouple natural covariation between temperature and photoperiod  \citep{Buonaiuto2023} and integrate new understanding of the multiple ways plants sense daylength \citep{wang2024plants}.  %emw11Dec: Hmm, I suspect there is a Korner or Basler paper we could cite instead of Dan's paper? 
 Beyond small-scale experiments, understanding local-scale trends and how they scale up to subcontinental scales could help inform what trends plant may leverage to predict their environments over time. Understanding how plant responses to photoperiod and temperature vary regionally will help clarify broader synchrony patterns.
 % =>  and finally: inform phenological models, allowing researchers to build more accurate predictions by incorporating the specific cues plants use to trigger growth
