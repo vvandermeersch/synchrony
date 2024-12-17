@@ -8,14 +8,14 @@ wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 # source(file.path(wd, "scripts", "preamble.R"))
 
 # Load data
-optimality <- readRDS(file.path(wd, "data/processed/era5land", paste0("optimality3_","1951_2020",".rds")))
+optimality <- readRDS(file.path(wd, "data/processed/era5land",  paste0("optimality_", 1951 ,"_", 2020, "_", "tlow", 5, "_tupp", 35, ".rds")))
 global_optimum <- optimality %>% 
   group_by(doy) %>%
   summarise(opt = mean(opt), growth_pot = mean(growth_pot), env_pred = mean(env_pred)) %>%
-  mutate(qt = quantile(opt, 0.95), opt_period = opt > qt)
+  mutate(qt = quantile(opt, 0.90), opt_period = opt > qt)
 local_optima <- optimality %>%
   group_by(id) %>%
-  mutate(qt = quantile(opt, 0.95)) %>%
+  mutate(qt = quantile(opt, 0.90)) %>%
   dplyr::filter(opt > qt)
 
 # Left panel: pareto front
@@ -41,11 +41,14 @@ pareto_front <- ggplot() +
   geom_line(aes(y = env_pred, x = growth_pot, color = opt_period, group = 1), 
             data = global_optimum, lineend = "round",
             linewidth = 0.6) +
+  geom_point(aes(y = env_pred, x = growth_pot, color = opt_period), 
+            data = global_optimum,
+            size = 0.3)
   geom_segment(aes(x = max_growth_pot, y = 1, xend = bmin$growth_pot, yend = bmin$env_pred),
                color = "#c1121f", linewidth = 0.3, alpha = 0.9, linetype = "dashed") +
   geom_segment(aes(x = max_growth_pot, y = 1, xend = bmax$growth_pot, yend = bmax$env_pred),
                color = "#c1121f", linewidth = 0.3, alpha = 0.9 , linetype = "dashed") +
-  scale_color_manual(values = c("#457b9d", "#c1121f")) +
+  scale_color_manual(values = c("#17a353", "#c1121f")) +
   scale_x_continuous(position = "top") +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
@@ -72,7 +75,7 @@ optimum_plot <- ggplot() +
   geom_line(aes(y = opt, x = doy, color = opt_period, group = 1), 
             data = global_optimum,
             linewidth = 0.6, lineend = "round") +
-  scale_color_manual(values = c("#457b9d", "#c1121f")) +
+  scale_color_manual(values = c("#17a353", "#c1121f")) +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
@@ -84,4 +87,4 @@ optimum_plot <- ggplot() +
 
 # Gather & save!
 cowplot::ggsave2(filename = file.path(wd, "figures", "global_optimality.pdf"),
-                 plot = pareto_front + optimum_plot, device = cairo_pdf, width = 100, height = 60, unit = "mm")
+                 plot = pareto_front + plot_spacer( )+ optimum_plot +  plot_layout(widths = c(1, 0.1, 1)), device = cairo_pdf, width = 130, height = 70, unit = "mm")
