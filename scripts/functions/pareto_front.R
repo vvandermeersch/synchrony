@@ -1,6 +1,6 @@
 
 
-data_plot <- global_optimum %>% filter(period == "2000 BP")
+data_plot <- global_optimum
 
 bmin <- data_plot %>%
   filter(opt_period) %>%

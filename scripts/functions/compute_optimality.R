@@ -42,9 +42,11 @@ compute_optimality <- function(gdd, ncores = 2){
   gdd_rem <- tapp(gdd_rem, i, fun=mean)
   
   # transform rasters to a data.frame (more convenient to plot results)
-  ind <- which(!is.na(values(subset(gdd_rem,1))))
-  data_plot <- lapply(ind, function(i){
-    data.frame(id = i, doy = 1:365, env_pred = t(extract(rsq, i)), growth_pot = t(extract(gdd_rem, i)))
+  ind <- data.frame(id = which(!is.na(values(subset(gdd_rem,1)))), crds(subset(gdd_rem,1), df = TRUE))
+  
+  data_plot <- lapply(1:nrow(ind), function(i){
+    data.frame(id = ind[i, "id"], doy = 1:365, env_pred = t(extract(rsq, ind[i, "id"])), growth_pot = t(extract(gdd_rem, ind[i, "id"])), 
+               x = ind[i, "x"], y = ind[i, "y"])
   })
   data_plot <- as.data.frame(do.call(rbind, data_plot))
   

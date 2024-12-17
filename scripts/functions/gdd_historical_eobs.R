@@ -1,6 +1,7 @@
-#---------------------------------------------#
-# GDD optimum in historical conditions (EOBS) #
-#---------------------------------------------#
+
+#------------------------------------------------------#
+# GDD optimum in historical conditions (based on EOBS) #
+#------------------------------------------------------#
 
 wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 source(file.path(wd, "scripts", "preamble.R"))
@@ -18,14 +19,20 @@ years <- c(1951:2020)
 rerun <- TRUE # switch to avoid to recompute everything
 if(rerun){
   
-  # sample sites
-  temp <- crop(subset(eobs_r,1), ext(c(-10.5, 34, 36, 71)))
-  sites <- spatSample(temp, size = 800, "regular", ext = ext(c(-10.5, 34, 36, 71)),
+  # Sample sites (keep only Europe-ish)
+  temp <- subset(eobs_r,1) %>% mask(eu_map)
+  mask <- as.data.frame(crop(temp, ext(c(-11.5, 34, 36, 71))), xy = TRUE)
+  mask[mask$x > 0 & mask$x < 11 & mask$y > 36 & mask$y < 38,3] <- NA
+  mask_r <- rast(mask)
+  rm(mask)
+  sites <- spatSample(mask_r, size = 900, "regular", ext = ext(c(-11.5, 34, 36, 71)),
                       cells=FALSE, xy=TRUE, values=FALSE, na.rm = TRUE, exhaustive = TRUE) %>% vect()
+  crs(mask_r) <- crs(sites) <- "EPSG:4326"
   
   # find the maximum aggregation factor (to reduce size of rasters and computation time thereafter)
   agf <- 1
-  while(length(values(aggregate(mask(temp, sites),agf,na.rm=TRUE), na.rm = TRUE)) == length(sites)){
+  nsites <- length(values(aggregate(mask(temp, sites),agf,na.rm=TRUE), na.rm = TRUE)) 
+  while(length(values(aggregate(mask(temp, sites),agf,na.rm=TRUE), na.rm = TRUE)) == nsites){
     agf <- agf + 1
   }
   agf <- agf - 1
@@ -40,9 +47,10 @@ if(rerun){
     gdd
   }))
   gc()
+  sites$id <- rev(which(!is.na(values(subset(gdd,1)))))
   
   #  Compute optimum
-  optimality <- compute_optimality(gdd, ncores = 10)
+  optimality <- compute_optimality(gdd, ncores = 6)
   optimality$period <- "1951_2020"
   optimality$tbase <- tbase
   optimality$tupper <- tupper
@@ -74,6 +82,7 @@ optimum_plot <- ggplot() +
                width = 0.015, color = "#c1121f",
                linewidth = 0.3, outliers = FALSE,
                data = local_optima) +
+  # geom_point(aes(x = mean(local_optima$doy), y = max(global_optimum$opt) +0.03), color = "#c1121f") +
   # geom_line(aes(y = opt, x = doy), 
   #           data = global_optimum,
   #           color = "white", linewidth = 1.5) +
@@ -84,8 +93,13 @@ optimum_plot <- ggplot() +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(),
         strip.background = element_blank(), 
-        axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 9)) +
+        axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 9)
+        ) +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(global_optimum$opt), max(global_optimum$opt) +0.05), 
                   expand = FALSE)
+
+cowplot::ggsave2(filename = file.path(wd, "figures", "optimality.pdf"),
+                 plot = optimum_plot, device = cairo_pdf, width = 68, height = 58, unit = "mm")
+

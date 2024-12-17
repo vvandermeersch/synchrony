@@ -15,7 +15,7 @@ data_dir <- "D:/climate/HadCM3B_60Kyr_Climate/2023_dataset/phenofit_format/025de
 
 # Compute GDD and optimality
 periods <- seq(2000,11000,3000)
-rerun <- TRUE # switch to avoid to recompute everything
+rerun <- FALSE # switch to avoid to recompute everything
 if(rerun){
   for(period in periods){
     gdd <- rast(lapply((period-15):(period+15), function(yr){
@@ -44,13 +44,13 @@ optimality_holocene$period <- factor(paste(optimality_holocene$period, "BP"), le
 
 local_optima <- optimality_holocene %>%
   group_by(period, id) %>%
-  mutate(q95 = quantile(opt, 0.95)) %>%
+  mutate(q95 = quantile(opt, 0.9)) %>%
   dplyr::filter(opt > q95) 
 
 global_optimum <- optimality_holocene %>% 
   group_by(period, doy) %>%
   summarise(opt = median(opt), env_pred = median(env_pred), growth_pot=median(growth_pot)) %>%
-  mutate(q95 = quantile(opt, 0.95), opt_period = opt > q95)
+  mutate(q95 = quantile(opt, 0.9), opt_period = opt > q95)
 
 optimum_plot <- ggplot() +
   facet_wrap(~ period, nrow = 1) +
@@ -66,7 +66,7 @@ optimum_plot <- ggplot() +
   geom_line(aes(y = opt, x = doy, color = opt_period, group = 1), 
             data = global_optimum,
             linewidth = 0.6, lineend = "round") +
-  scale_color_manual(values = c("#457b9d", "#c1121f")) +
+  scale_color_manual(values = c("#17a353", "#c1121f")) +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(),
         strip.background = element_blank(), 
@@ -74,7 +74,13 @@ optimum_plot <- ggplot() +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(global_optimum$opt), max(global_optimum$opt) +0.05), 
-                  expand = FALSE)
+                  expand = FALSE) +
+  theme(legend.position = 'none', panel.grid = element_blank(),
+        strip.background = element_blank(), 
+        axis.title = element_text(size = 7.5, color = "grey20"),
+        axis.text = element_text(size = 6.5, color = "grey30"),
+        panel.border=element_rect(color = "grey30"),
+        axis.ticks = element_line(color = "grey30", linewidth = 0.3))
 
 cowplot::ggsave2(filename = file.path(wd, "figures/supp", "optimality_holocene.pdf"),
         plot = optimum_plot, device = cairo_pdf, width = 180, height = 58, unit = "mm")
