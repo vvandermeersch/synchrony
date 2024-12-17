@@ -4,6 +4,7 @@
 \usepackage{xcolor} 
 \definecolor{Accent}{HTML}{bd2b00} 
 \usepackage{natbib}
+\usepackage{gensymb}
 \usepackage{hyperref}
 \hypersetup{colorlinks,citecolor = Accent, linkcolor = Accent,urlcolor = Accent, breaklinks=true}
 \usepackage{cleveref}
@@ -46,16 +47,18 @@ The timing of major plant transitions---such as start of growth with leafout---s
 In particular, it is well established that plants respond primarily to integrated climate forcing, often measured as the accumulation of warm temperatures, in a given range---where metabolism is sufficient---and over a given period \citep[growing degree-days or GDD;][]{Chuine2017}. %emw11Dec: I would give a citation for GDD or -- if Isabelle's 2017 paper uses this term -- then just move the citation down to end of sentence. 
 % vvdm12Dec: Isabelle uses the terms "degree-day sum", "degree-day accumulation", "growing degree-day model"... So I think we're fine!
 This heat accumulation is a key factor in development and growth processes of both crops \citep[e.g.][]{Cross1972} and wild plants \citep[e.g.][]{Hunter1992}. The number of GDD accumulated throughout the season directly impacts how quickly cells elongate to form new organs and how quickly a plant progresses through growth stages. Plants are thus expected to take full advantage of warmer years (with a high GDD accumulation) to maximize growth and set more flowers for the following season \textbf{(REF)}. %emw11Dec: Would be nice to have a classic citation for this! I suspect Larcher's plant phys book says it or Isabelle or you may have better ideas. 
+%vvdm17Dec I cannot really check in Larcher's book...
+
 
 % \item Given $GDD$ is so important, plants should thus transition into events when they can best predict $GDD_{total}$ within growing season -- while still having enough time/energy \emph{to do what they need to do}
-Given the importance of GDD, plants should ideally time their transitions when their ability to predict the total GDD within the growing season is high while still having enough potential thermal energy to complete essential growth and reproductive processes. This trade-off means that there should be an optimal period when plants have accumulated enough GDD to reliably predict the total GDD by the end of the year---\emph{environmental predictability}, while enough GDD still remains---which we call \emph{growth potential}. Here, we define environmental predictability based on how well GDD accumulated by a day ($d$) predicts the total GDD each year (measured as the $R^2$ of a linear regression across years using 1 January to start accumulation) and growth potential as remaining GDD on day $d$ (see Supplementary methods and Supplementary Figure S1). %emw11Dec: please check if my edits still present this correctly ... 
+Given the importance of GDD, plants should ideally time their transitions when their ability to predict the total GDD within the growing season is high while still having enough potential thermal energy to complete essential growth and reproductive processes. This trade-off means that there should be an optimal period when plants have accumulated enough GDD to reliably predict the total GDD by the end of the year---\emph{environmental predictability}, while enough GDD still remains---which we call \emph{growth potential}. Here, we define environmental predictability based on how well GDD accumulated by a day ($d$) predicts the total GDD each year (measured as the $R^2$ of a linear regression across years using 1 January to start accumulation) and growth potential as remaining GDD on day $d$ (see Supplementary Methods and Supplementary Figure S1). %emw11Dec: please check if my edits still present this correctly ... 
 This simple definition allows us to examine which window in the season appears optimal for plants to maximize growth and development while minimizing risks.
 
 \begin{figure}[h]
 \centering
 \includegraphics{global_optimality.pdf}
 \vspace*{-0.7cm}
-\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe (1951-2020).} In the left panel, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In the right panel, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the blue curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days).} 
+\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe (1951-2020).} In the left panel, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In the right panel, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the blue curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see Figure S2 for 0-40\degree C).} 
 \label{fig:globaloptimality}
 \end{figure}
 
@@ -108,7 +111,9 @@ Disentangling the role of the solstice as a cue for major growth and reproductiv
 Complex natural correlations in environmental data may generate spurious results \citep[e.g.][]{Gao2024}, challenging us to test predictions from multiple avenues. % "inherent correlations in climate in regions that the field does not fully understand/incorporate"
 Future research should explore which thermal cues might allow plants to track the optimal period, and whereas they remain reliable in future climates (Supplementary Figure S3).
 % as daily GDD accumulation peak after solstice suggests the need for an alternative cue...?
-To address this requires carefully designed experiments that decouple natural covariation between temperature and photoperiod  \citep{Buonaiuto2023} and integrate new understanding of the multiple ways plants sense daylength \citep{wang2024plants}.  %emw11Dec: Hmm, I suspect there is a Korner or Basler paper we could cite instead of Dan's paper? 
+To address this requires carefully designed experiments that decouple natural covariation between temperature and photoperiod  \citep{Buonaiuto2023} and integrate new understanding of the multiple ways plants sense daylength \citep{wang2024plants}.  
+%emw11Dec: Hmm, I suspect there is a Korner or Basler paper we could cite instead of Dan's paper? 
+%vvdm17Dec: do you have a specific paper in mind? this one: https://doi.org/10.1093/treephys/tpu021 ? (even though the focus is not on the covariation of temperature and photoperiod?)
 Beyond small-scale experiments, understanding local-scale trends and how they scale up to subcontinental scales could help inform what trends plant may leverage to predict their environments over time. Understanding how plant responses to photoperiod and temperature vary regionally will help clarify broader synchrony patterns.
 % =>  and finally: inform phenological models, allowing researchers to build more accurate predictions by incorporating the specific cues plants use to trigger growth
 
@@ -117,7 +122,7 @@ Beyond small-scale experiments, understanding local-scale trends and how they sc
 \hspace*{-1.2cm}
 \includegraphics{local_optimality_alt.pdf}
 \vspace*{-0.7cm}
-\caption{\textbf{Variation in optimal timing reflects different climatic conditions across Europe.}}
+\caption{\textbf{Variation in optimal timing reflects different climatic conditions across Europe (1951-2020).} On the left panel, each curve shows the evolution of optimality for a given site. Sites are sampled on a regular grid across Europe, as shown on the central map. Colors indicate the timing---relative to the solstice---of the median optimal day. The two panels on the right show the trade-off between environmental predictability and growth potential (scaled to $[0,1]$) for two different sites. Days considered as optimal are highlighted in red.}
 \label{fig:localoptimality}
 \end{figure}
 

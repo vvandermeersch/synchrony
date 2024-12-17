@@ -1,5 +1,5 @@
 \documentclass[11pt,letter]{article}
-\usepackage[top=1.00in, bottom=1.0in, left=1.1in, right=1.1in]{geometry}
+\usepackage[top=0.30in, bottom=0.7in, left=1.1in, right=1.1in]{geometry}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{xcolor} 
 \usepackage{amsmath}
@@ -30,7 +30,7 @@
 
 \section*{Supplementary methods}
 
-All analyses were run on \textbf{\textsf{R}}, using the package \texttt{terra} for raster manipulation \citep{Hijmans2024}.
+All analyses were run on \textbf{\textsf{R}}, using the package \texttt{terra} for raster manipulation \citep{Hijmans2024}. The workflow of the analysis is represented in the \Cref{fig:method}.
 
 \paragraph{Climate data}
 Daily mean temperatures from 1951 to 2020 were extracted from the ERA5-Land dataset, at a 0.1\degree~spatial resolution \citep{MunozSabater2021}. We sampled $>$500 sites on a regular grid across Europe (see Figure 2 in the main text).\\
@@ -47,36 +47,46 @@ GDD_d =
 \noindent where $T_d$ is the mean temperature at the day d, and $T_{lower}$/$T_{upper}$ the lower/upper temperature thresholds (defining the range within which metabolism is likely active). Here, we chose $T_{lower}=5$\degree C and $T_{upper}=35$\degree C. 
 
 \paragraph{Optimal period} For each day and each site, environmental predictability was computed as the $R^2$ of the linear regression across years between total GDD and the GDD accumulated by that day (blue panel, \Cref{fig:method}). Growth potential was defined as the remaining GDD to be accumulated from that day until the end of the year (yellow panel, \Cref{fig:method}). While other trade-offs could be considered, this appears to be the most intuitive choice. Both environmental predictability and growth potential were computed for the entire year (January 1 to December 31), although the growing season is likely more restricted and varies across locations. \\
-We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they felt within the top 10\% of the most optimal days.
+We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential (scaled to $[0,1]$) are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they felt within the top 10\% of days with the higher optimality.
 
 \begin{figure}[hb]
 \hspace*{-1.4cm}
 \includegraphics{method_figure.pdf}
-\vspace*{-0.7cm}
+\vspace*{-0.4cm}
 \caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}}
 \label{fig:method}
 \end{figure}
 
 \clearpage
 
-\begin{figure}[hb]
+\begin{figure}[h]
+\hspace*{-1.2cm}
+% \includegraphics{gdd_040.pdf}
+\vspace*{-0.4cm}
+\caption{\textbf{Average optimal trade-off between environmental predictability and growth potential across Europe, with an alternative GDD definition} ($T_{lower}=5$\degree C and $T_{upper}=35$\degree C).}
+\label{fig:holocene}
+\end{figure}
+
+\begin{figure}[h]
 \hspace*{-1.2cm}
 \includegraphics{optimality_holocene.pdf}
-\vspace*{-0.7cm}
+\vspace*{-1cm}
 \caption{\textbf{The average optimal trade-off between environmental predictability and growth potential is relatively stable across the Holocene.} Daily mean temperatures were obtained from \citet{VanderMeersch2024}, in which daily data were generated with the GWGEN weather generator \citep{Sommer2017} based on monthly paleosimulations from the HadCM3B-M2.1 coupled general circulation model \citep{Armstrong2019}. BP stand for "Before Present" (i.e. 1950).}
 \label{fig:holocene}
 \end{figure}
 
-\begin{figure}[hb]
+\begin{figure}[h]
 \centering
 \includegraphics{optimality_future.pdf}
-\vspace*{-0.2cm}
-\caption{\textbf{The future optimal trade-off between environmental predictability and growth potential (2071-2100)s.} Daily mean temperatures came from the last Coupled Model Intercomparison Project Phase 6 (CMIP6) climate  projections, for 5 global climate models (GCMs) and 2 shared socio-economic pathways (SSPs). Model projections were downscaled to a 0.1° resolution with a statistical trend-preserving method (the cumulative distribution function transform), using the ERA5-Land reanalysis as a reference observational dataset between 1981 and 2010 \citep{Noel2022}. The five GCMs were GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0 and UKESM1-0-LL.}
+\vspace*{-0.5cm}
+\caption{\textbf{The future optimal trade-off between environmental predictability and growth potential (2071-2100)s.} Daily mean temperatures came from the last Coupled Model Intercomparison Project Phase 6 (CMIP6) climate  projections, for 5 global climate models (GCMs) and 2 shared socio-economic pathways (SSPs). Model projections were downscaled to a 0.1° resolution with a statistical trend-preserving method (the cumulative distribution function transform), using the ERA5-Land reanalysis as a reference observational dataset between 1981 and 2010 \citep{Noel2022}. The five GCMs are GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0 and UKESM1-0-LL.}
 \label{fig:future}
+\vspace*{-10cm}
 \end{figure}
 
 
-
+\clearpage
+\vspace*{1cm}
 \bibliography{synchrony}
 
 \end{document}
