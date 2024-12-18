@@ -1,7 +1,7 @@
 
-#-------------------------------------#
-# Supp figure S3: Holocene optimality #
-#-------------------------------------#
+#-----------------------------------#
+# Supp figure S4: future optimality #
+#-----------------------------------#
 
 wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 source(file.path(wd, "scripts", "preamble.R"))

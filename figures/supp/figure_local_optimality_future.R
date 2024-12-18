@@ -1,4 +1,12 @@
 
+#--------------------------------------------------------#
+# Supp figure S4: changes between historical and future  #
+#--------------------------------------------------------#
+
+library(patchwork)
+wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
+source(file.path(wd, "scripts", "preamble.R"))
+
 models <- c("GFDL-ESM4", "IPSL-CM6A-LR", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
 optimality_future_ssp2 <- lapply(models, function(m) readRDS(file.path(wd, "data/processed/cmip6",  paste0("optimality_","ssp245","_",m,".rds"))))
 optimality_future_ssp2 <- as.data.frame(do.call(rbind, optimality_future_ssp2))
@@ -20,6 +28,10 @@ sites <- as.data.frame(sites, geom = "XY") %>%
   vect(geom = c("x", "y"))
 crs(sites) <- "EPSG:4326"
 sites_df <- as.data.frame(sites, geom = "XY")
+mask_r <-  readRDS(file = file.path(wd, "data/processed", "mask.rds"))
+
+kippenberger <- c("#8B174DFF", "#AE2565FF", "#C1447EFF", "#D06C9BFF", "#DA9FB8FF", "#D9D2CCFF", 
+                  "#ADBE7CFF", "#8BA749FF", "#6E8537FF", "#4F5F28FF", "#343D1FFF")
 
 
 map <- ggplot() +
@@ -47,7 +59,8 @@ map <- ggplot() +
     legend.position.inside =c(0.2,.8),
     legend.direction="horizontal",
     legend.title = element_text(size = 7, color = "grey20"),
-    plot.margin = margin(t = 0, b = 0, l = 0, r = 0))+
+    plot.margin = margin(t = 0, b = -10, l = 0, r = 0),
+    strip.text.x.top = element_text(size = 8.5, color = "grey20"))+
   guides(
     color = guide_colorbar(order = 1,
                            frame.colour = "grey30", ticks.colour = NA,
@@ -58,7 +71,11 @@ map <- ggplot() +
                                          legend.text = element_text(size = 7, 
                                                                     margin = margin(t = 3.5), color = "grey20"))))
 
-map +  guide_area() +  plot_layout(guides = "collect", ncol = 1, heights = c(1,0.1))
+# load Sankey diagrams
+source(file.path(wd, "figures/supp", "local_change_sankey_diagrams_future.R"))
+
+assemble <- map +  sankey_diagrams + guide_area() +  plot_layout(guides = "collect", ncol = 1, heights = c(1.5,1,0.1))
 
 cowplot::ggsave2(filename = file.path(wd, "figures/supp", "local_optimality_future.pdf"),
-                 plot = map, device = cairo_pdf, width = 90, height = 90, unit = "mm")
+                 plot = assemble, 
+                 device = cairo_pdf, width = 130, height = 130, unit = "mm")
