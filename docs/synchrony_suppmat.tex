@@ -57,8 +57,6 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \label{fig:method}
 \end{figure}
 
-\clearpage
-
 \begin{figure}[h]
 \centering
 \includegraphics{global_optimality_0_40.pdf}
@@ -67,26 +65,38 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \label{fig:altgdd}
 \end{figure}
 
+\clearpage
+
 \begin{figure}[h]
 \hspace*{-1.2cm}
-\includegraphics{optimality_holocene.pdf}
-\vspace*{-1cm}
+\includegraphics[scale = 1]{optimality_holocene.pdf}
+\vspace*{-0.7cm}
 \caption{\textbf{The average optimal trade-off between environmental predictability and growth potential is relatively stable across the Holocene.} Daily mean temperatures were obtained from \citet{VanderMeersch2024}, in which daily data were generated with the GWGEN weather generator \citep{Sommer2017} based on monthly paleosimulations from the HadCM3B-M2.1 coupled general circulation model \citep{Armstrong2019}. BP stand for "Before Present" (i.e. 1950).}
 \label{fig:holocene}
 \end{figure}
 
+\vspace*{-0.7cm}
 \begin{figure}[h]
 \centering
 \includegraphics{optimality_future.pdf}
 \vspace*{-0.5cm}
 \caption{\textbf{Average optimal trade-off between environmental predictability and growth potential in future climates (2071-2100).} Daily mean temperatures came from the last Coupled Model Intercomparison Project Phase 6 (CMIP6) climate  projections, for 5 global climate models (GCMs) and 2 shared socio-economic pathways (SSPs). Model projections were downscaled to a 0.1° resolution with a statistical trend-preserving method (the cumulative distribution function transform), using the ERA5-Land reanalysis as a reference observational dataset between 1981 and 2010 \citep{Noel2022}. Thin lines represent the five GCMs (GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0 and UKESM1-0-LL), large lines represent the average across GCMs.}
 \label{fig:future}
+\end{figure}
+
+\vspace*{-1.2cm}
+\begin{figure}[h]
+\centering
+\includegraphics[scale = 1]{local_optimality_future.pdf}
+\vspace*{-0.4cm}
+\caption{\textbf{Solstice may not represent a reliable cue for the optimal period under future climatic conditions (2071-2100).} Sites are sampled on a regular grid across Europe. Colors indicate the timing—relative to the solstice—of the median optimal day.}
+\label{fig:holocene}
 \vspace*{-10cm}
 \end{figure}
 
 
 \clearpage
-\vspace*{1cm}
+\vspace*{0cm}
 \bibliography{synchrony}
 
 \end{document}
