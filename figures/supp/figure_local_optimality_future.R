@@ -9,22 +9,21 @@ optimality_future_ssp5$ssp <-"SSP5-8.5"
 optimality_future <- rbind(optimality_future_ssp2, optimality_future_ssp5)
 
 local_optima <- optimality_future %>%
-  group_by(id) %>%
+  group_by(ssp,id) %>%
   mutate(qt = quantile(opt, 0.90), opt_period = opt > qt, 
          optdoy = median(doy[opt_period]), deltaopt = optdoy-172,
          deltaopt = if_else(deltaopt > 20, 20, if_else(deltaopt < -20, -20, deltaopt)))
 
 sites <- readRDS(file.path(wd, "data/processed", "sites.rds"))
 sites <- as.data.frame(sites, geom = "XY") %>%
-  left_join(unique(local_optima[c("id", "deltaopt")]), join_by(id)) %>%
+  left_join(unique(local_optima[c("ssp","id", "deltaopt")]), join_by(id)) %>%
   vect(geom = c("x", "y"))
 crs(sites) <- "EPSG:4326"
 sites_df <- as.data.frame(sites, geom = "XY")
 
 
 map <- ggplot() +
-  # tidyterra::geom_spatraster(data = mask_r %>% project("EPSG:3035")) +
-  # scale_fill_gradient(low = "grey50", high = "grey45", na.value = "transparent", guide = FALSE) +
+  facet_wrap(~ssp) +
   tidyterra::geom_spatvector(data = aggregate(eu_map) %>% crop(ext(mask_r)) %>% project("EPSG:3035"), fill = "white",
                              linewidth = 0.1, color = "grey60") +
   tidyterra::geom_spatvector(data = sites %>% project("EPSG:3035"), 
@@ -59,4 +58,7 @@ map <- ggplot() +
                                          legend.text = element_text(size = 7, 
                                                                     margin = margin(t = 3.5), color = "grey20"))))
 
+map +  guide_area() +  plot_layout(guides = "collect", ncol = 1, heights = c(1,0.1))
 
+cowplot::ggsave2(filename = file.path(wd, "figures/supp", "local_optimality_future.pdf"),
+                 plot = map, device = cairo_pdf, width = 90, height = 90, unit = "mm")

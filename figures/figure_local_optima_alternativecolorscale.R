@@ -8,7 +8,7 @@ wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
 source(file.path(wd, "scripts", "preamble.R"))
 
 # Load data
-optimality <- readRDS(file.path(wd, "data/processed/era5land", paste0("optimality3_","1951_2020",".rds")))
+optimality <- readRDS(file.path(wd, "data/processed/era5land",  paste0("optimality_", 1951 ,"_", 2020, "_", "tlow", 5, "_tupp", 35, ".rds")))
 local_optima <- optimality %>%
   group_by(id) %>%
   mutate(qt = quantile(opt, 0.90), opt_period = opt > qt, 
