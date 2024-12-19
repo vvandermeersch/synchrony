@@ -46,7 +46,7 @@ sankey_diagrams <- ggplot(rbind(df_ssp2,df_ssp5),
                next_node = next_node,
                fill = node)) +
   facet_wrap(~ ssp) +
-  geom_sankey(flow.alpha = 0.5, node.color = NA, width = 0.1, type = "sankey", space = 1) +
+  geom_sankey(flow.alpha = 0.5, node.color = NA, width = 0.03, type = "sankey", space = 1) +
   scale_fill_gradientn(colors = kippenberger, breaks = seq(-20, 20, 20), limits = c(-20,20),
                         labels = c(paste0("\u2264\u2212","20"),  "0", paste0("\u2265","20")),
                         name = "Optimal timing (relative to solstice)") +
@@ -54,7 +54,7 @@ sankey_diagrams <- ggplot(rbind(df_ssp2,df_ssp5),
   theme(legend.position = 'none') +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
-        axis.text.x = element_text(size = 8, color = "grey20"), 
+        axis.text.x = element_text(size = 7.5, color = "grey20"), 
         axis.text.y = element_blank(),
         axis.title = element_blank(),
         plot.margin = margin(t = 0, b = 10, l = 20, r = 20),
@@ -64,7 +64,7 @@ sankey_diagrams <- ggplot(rbind(df_ssp2,df_ssp5),
         panel.spacing = unit(25, "pt"),
         strip.text.x.top = element_blank()) +
   coord_cartesian(expand = FALSE) +
-  scale_x_discrete(position = 'top', labels = c("   1951-2020", "2071-2100   "))
+  scale_x_discrete(position = 'top', labels = c("     1951-2020", "2071-2100     "))
   
   
 
