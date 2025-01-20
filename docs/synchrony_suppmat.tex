@@ -28,8 +28,9 @@
 
 \maketitle
 
-\section*{Supplementary methods}
+\section*{Supplementary methods} %emw19Jan -- this supplement is really amazing! If we don't end up in a short-form journal, I will. be very happy to see much of this in a main text somewhere!
 
+%emw19Jan -- I would use active voice a little more, but this sees okay. 
 All analyses were run on \textbf{\textsf{R}}, using the package \texttt{terra} for raster manipulation \citep{Hijmans2024}. The workflow of the analysis is represented in the \Cref{fig:method}.
 
 \paragraph{Climate data}
@@ -44,16 +45,17 @@ GDD_d =
 \end{cases}       
 \end{equation}
 
-\noindent where $T_d$ is the mean temperature at the day d, and $T_{lower}$/$T_{upper}$ the lower/upper temperature thresholds (defining the range within which metabolism is likely active). Here, we chose $T_{lower}=5$\degree C and $T_{upper}=35$\degree C (see \Cref{fig:altgdd} for the same analysis with 0-40\degree C range). 
+\noindent where $T_d$ is the mean temperature at the day $d$, and $T_{lower}$/$T_{upper}$ the lower/upper temperature thresholds (defining the range within which metabolism is likely active). Here, we chose $T_{lower}=5$\degree C and $T_{upper}=35$\degree C (see \Cref{fig:altgdd} for the same analysis with 0-40\degree C range). 
 
-\paragraph{Optimal period} For each day and each site, environmental predictability was computed as the $R^2$ of the linear regression across years between total GDD and the GDD accumulated by that day (blue panel, \Cref{fig:method}). Growth potential was defined as the remaining GDD to be accumulated from that day until the end of the year (yellow panel, \Cref{fig:method}). While other trade-offs could be considered, this appears to be the most intuitive choice. Both environmental predictability and growth potential were computed for the entire year (January 1 to December 31), although the growing season is likely more restricted and varies across locations. \\
-We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential (scaled to $[0,1]$) are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they felt within the top 10\% of days with the higher optimality.
+\paragraph{Optimal period} For each day and each site, environmental predictability was computed as the $R^2$ of the linear regression across years between total GDD and the GDD accumulated by that day (blue panel, \Cref{fig:method}). Growth potential was defined as the remaining GDD to be accumulated from that day until the end of the year (yellow panel, \Cref{fig:method}). While other trade-offs could be considered, we chose this as the simplest option (and perhaps most obvious), especially given our limited understanding of the underlying loss functions plants may rely on. Both environmental predictability and growth potential were computed for the entire year (January 1 to December 31), although the growing season is likely more restricted and varies across locations. \\
+%emw19Jan -- Can you explain where the 1.414 comes from a little? 
+We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential (scaled to $[0,1]$) are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they fell within the top 10\% of days with the higher optimality.
 
 \begin{figure}[hb]
 \hspace*{-1.4cm}
 \includegraphics{method_figure.pdf}
 \vspace*{-0.4cm}
-\caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}}
+\caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}} %emw19Jan -- This figure is so nice and super helpful for readers.
 \label{fig:method}
 \end{figure}
 
@@ -61,7 +63,7 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 
 \begin{figure}[h]
 \centering
-\includegraphics{global_optimality_0_40.pdf}
+\includegraphics{global_optimality_0_40.pdf} %emw19Jan -- I would contrast this a bit more with the next figure in the caption similar to what I suggested in main text. So in the next figure caption you should stress how this is different from findings of the average and here you could even reference the next figure if you like.... 
 \vspace*{-0.4cm}
 \caption{\textbf{Average optimal trade-off between environmental predictability and growth potential across Europe, with an alternative GDD definition} ($T_{lower}=0$\degree C and $T_{upper}=40$\degree C).}
 \label{fig:altgdd}
