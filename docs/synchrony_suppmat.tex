@@ -34,7 +34,7 @@
 All analyses were run on \textbf{\textsf{R}}, using the package \texttt{terra} for raster manipulation \citep{Hijmans2024}. The workflow of the analysis is represented in the \Cref{fig:method}.
 
 \paragraph{Climate data}
-Daily mean temperatures from 1951 to 2020 were extracted from the ERA5-Land dataset, at a 0.1\degree~spatial resolution \citep{MunozSabater2021}. We sampled $>$500 sites on a regular grid across Europe (see Figure 2 in the main text).\\
+We extracted daily mean temperatures, from 1951 to 2020, from the ERA5-Land dataset, at a 0.1\degree~spatial resolution \citep{MunozSabater2021}. We sampled $>$500 sites on a regular grid across Europe (see Figure 2 in the main text).\\
 Following \citet{McMaster1997}, we define growing degree-days at a day d ($GDD_d$) as:
 \begin{equation}
 GDD_d =
@@ -47,9 +47,11 @@ GDD_d =
 
 \noindent where $T_d$ is the mean temperature at the day $d$, and $T_{lower}$/$T_{upper}$ the lower/upper temperature thresholds (defining the range within which metabolism is likely active). Here, we chose $T_{lower}=5$\degree C and $T_{upper}=35$\degree C (see \Cref{fig:altgdd} for the same analysis with 0-40\degree C range). 
 
-\paragraph{Optimal period} For each day and each site, environmental predictability was computed as the $R^2$ of the linear regression across years between total GDD and the GDD accumulated by that day (blue panel, \Cref{fig:method}). Growth potential was defined as the remaining GDD to be accumulated from that day until the end of the year (yellow panel, \Cref{fig:method}). While other trade-offs could be considered, we chose this as the simplest option (and perhaps most obvious), especially given our limited understanding of the underlying loss functions plants may rely on. Both environmental predictability and growth potential were computed for the entire year (January 1 to December 31), although the growing season is likely more restricted and varies across locations. \\
+\paragraph{Optimal period} For each day and each site, we computed environmental predictability as the $R^2$ of the linear regression across years between total GDD and the GDD accumulated by that day (blue panel, \Cref{fig:method}). Growth potential was defined as the remaining GDD to be accumulated from that day until the end of the year (yellow panel, \Cref{fig:method}). While other trade-offs could be considered, we chose this as the simplest option (and perhaps most obvious), especially given our limited understanding of the underlying loss functions plants may rely on. We computed both environmental predictability and growth potential for the entire year (January 1 to December 31), although the growing season is likely more restricted and varies across locations. \\
 %emw19Jan -- Can you explain where the 1.414 comes from a little? 
-We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential (scaled to $[0,1]$) are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they fell within the top 10\% of days with the higher optimality.
+We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential (scaled to $[0,1]$) are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)$ is the Euclidean distance between the point $(0,0)$ and the point $(1,1)$, i.e. $max(D)=\sqrt{1^2+1^2}\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they fell within the top 10\% of days with the higher optimality.
+
+
 
 \begin{figure}[hb]
 \hspace*{-1.4cm}
@@ -96,8 +98,8 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \centering
 \includegraphics[scale = 1]{local_optimality_future.pdf}
 \vspace*{-0.4cm}
-\caption{\textbf{Solstice may not represent a reliable cue to track the optimal period under future climatic conditions (2071-2100).} On the top panel, sites are sampled on a regular grid across Europe. On the bottom panel, Sankey diagrams show the proportional flow of (site-specific) optimal timing from 1951-2020 to 2071-2100. Colors indicate the timing—relative to the solstice—of the median optimal day.}
-\label{fig:holocene}
+\caption{\textbf{Average optimal timing (\Cref{fig:future}) hides variation in optimal timing across the different future climatic conditions of Europe (2071-2100).} On the top panel, sites are sampled on a regular grid across Europe. On the bottom panel, Sankey diagrams show the proportional flow of (site-specific) optimal timing from 1951-2020 to 2071-2100. Colors indicate the timing—relative to the solstice—of the median optimal day.}
+\label{fig:futurelocal}
 \end{figure}
 
 {\footnotesize
@@ -105,3 +107,4 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \bibliography{synchrony}}
 
 \end{document}
+
