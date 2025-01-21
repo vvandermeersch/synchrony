@@ -25,11 +25,11 @@ if(rerun){
   
   # Sample sites (keep only Europe-ish)
   temp <- subset(era5_r,1) %>% mask(eu_map)
-  mask <- as.data.frame(crop(temp, ext(c(-11.5, 34, 36, 71))), xy = TRUE)
+  mask <- as.data.frame(crop(temp, ext(c(-10.55, 34.05, 35.85, 71.05))), xy = TRUE)
   # mask[mask$x > 0 & mask$x < 11 & mask$y > 36 & mask$y < 38,3] <- NA
   mask_r <- rast(mask)
   rm(mask)
-  sites <- spatSample(mask_r, size = 900, "regular", ext = ext(c(-11.5, 34, 36, 71)),
+  sites <- spatSample(mask_r, size = 900, "regular", ext = ext(c(-10.55, 34.05, 35.85, 71.05)),
                       cells=FALSE, xy=TRUE, values=FALSE, na.rm = TRUE, exhaustive = TRUE) %>% vect()
   crs(mask_r) <- crs(sites) <- "EPSG:4326"
   
@@ -44,7 +44,7 @@ if(rerun){
   
   gdd <- rast(lapply(years, function(yr){
     tmean <- aggregate(mask(crop(subset(subset(era5_r, which(time(era5_r, format = "years") == yr)),1:365),
-                                 ext(c(-11.5, 34, 36, 71))), sites),agf,na.rm=TRUE)
+                                 ext(c(-10.55, 34.05, 35.85, 71.05))), sites),agf,na.rm=TRUE)
     tmean <- ifel(tmean < tlower, tlower, ifel(tmean > tupper, tupper, tmean)) # apply lower and upper bound
     gdd <- cumsum(tmean-tlower)
     time(gdd) <- 1:365

@@ -14,7 +14,7 @@ tupper <- 35
 data_dir <- "D:/climate/CMIP6_Adjust"
 
 # Compute GDD and optimality
-ssp <- "ssp585"
+ssp <- "ssp245"
 models <- c("GFDL-ESM4", "IPSL-CM6A-LR", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
 years <- c(2071:2100)
 rerun <- TRUE # switch to avoid to recompute everything
@@ -25,7 +25,7 @@ if(rerun){
     # find the maximum aggregation factor (to reduce size of rasters and computation time thereafter)
     sites <- readRDS(file = file.path(wd, "data/processed", "sites.rds"))
     file <- data.frame(fread(file.path(data_dir, ssp, gcm, "phenofit_format", paste0(gcm,"_tmp_",2071,"_dly.fit"))))
-    temp <- rast(lapply(3, function(i) rast(file[,c(2,1,i)])))
+    temp <- crop(rast(lapply(3, function(i) rast(file[,c(2,1,i)]))), ext(c(-10.55, 34.05, 35.85, 71.05)))
     agf <- 1
     nsites <- length(values(aggregate(mask(temp, sites),agf,na.rm=TRUE), na.rm = TRUE))
     while(length(values(aggregate(mask(temp, sites),agf,na.rm=TRUE), na.rm = TRUE)) == nsites){
@@ -37,7 +37,7 @@ if(rerun){
     gdd <- rast(lapply(years, function(yr){
       file <- data.frame(fread(file.path(data_dir, ssp, gcm, "phenofit_format", paste0(gcm,"_tmp_",yr,"_dly.fit"))))
       tmean <- aggregate(mask(crop(rast(lapply(3:367, function(i) rast(file[,c(2,1,i)]))),
-                                   ext(c(-11.5, 34, 36, 71))), sites),agf,na.rm=TRUE)
+                                   ext(c(-10.55, 34.05, 35.85, 71.05))), sites),agf,na.rm=TRUE)
       tmean <- ifel(tmean < tbase, tbase, ifel(tmean > tupper, tupper, tmean)) # apply lower and upper bound
       gdd <- cumsum(tmean-tbase)
       time(gdd) <- 1:365
