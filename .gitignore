@@ -8,4 +8,10 @@ synchrony.Rproj
 
 **/scripts/old/
 
-
+.bst
+.aux
+.bbl
+.blg
+.log
+.out
+.gz
