@@ -8,6 +8,9 @@ synchrony.Rproj
 
 **/scripts/old/
 
+archive/
+
+
 *.bst
 *.aux
 *.bbl
