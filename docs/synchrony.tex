@@ -1,5 +1,5 @@
 \documentclass[11pt,letter]{article}
-\usepackage[top=0.80in, bottom=1.0in, left=1.1in, right=1.1in]{geometry}
+\usepackage[top=0.70in, bottom=0.8in, left=1.1in, right=1.1in]{geometry}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{xcolor} 
 \definecolor{Accent}{HTML}{bd2b00} 
@@ -14,6 +14,9 @@
 \RequirePackage[labelfont={bf,sf},%
                 font={small, sf}]{caption}
 
+\usepackage{lineno}
+\renewcommand\linenumberfont{\normalfont\tiny\color{gray}}
+
 \begin{document}
 
 \title{Solstice optimizes thermal growing season}
@@ -27,16 +30,18 @@ Vancouver, BC, Canada, V6T 1Z4. \\
 
 \noindent\rule{\textwidth}{0.3pt}
 % Alt sentence 1: Multiple studies have recently proposed the summer solstice as a universal trigger for major plant physiological processes. 
-\textbf{Abstract:} Recent research suggests that the summer solstice is an universal trigger for major plant physiological processes. While this would have strong implications for % fundamental plant biology and climate change forecasting, the underlying ...
- predicting forest and carbon cycle dynamics under climate change, the underlying mechanisms that could explain the emergence and importance of solstice as a cue still remain unclear. Here, we show that the solstice, on average, appears as a critical juncture for plants to optimally benefit from the thermal growing season---but we also find significant local variation and diverse trade-offs across different climates that suggest the potential of alternative cues.\\ % pick: significant local variation OR diverse trade-offs 
+\textbf{Abstract:} Multiple studies have recently proposed the summer solstice as a universal trigger for major plant physiological processes. While this would have strong implications for fundamental plant biology and climate change forecasting, the underlying mechanisms that could explain the emergence and importance of solstice as a cue still remain unclear. Here, we show that the solstice, on average, appears as a critical juncture for plants to optimally benefit from the thermal growing season---but we also find significant local variation across different climates that suggest the potential of alternative cues. % pick: significant local variation OR diverse trade-offs
+
 \noindent\rule{\textwidth}{0.3pt}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+
+\linenumbers
 
 Plants use environmental cues to adjust the timing of major growth and reproductive events in response to variability within and between years. While we often know the proximate triggers---such as temperature and photoperiod---the fitness landscape shaping selection on these cues remain largely unknown for many events \citep{Chuine2017}, leaving a critical gap in our understanding of how plants will respond and adapt to future climates.
 
 Recently, summer solstice has been proposed as a universal trigger to modulate cues and initiate key physiological processes \citep{Zohner2023, Journe2024}---an idea that builds on earlier suggestions of solstice-driven control of tree growth \citep{Rossi2006}. 
-Plants may rely on the solstice as a signal to initiate the shift from growth to tissue maturation before winter and to prepare for reproduction in the following year through flower bud differentiation \citep{Rossi2006, Zohner2023, Journe2024}. This hypothesis suggests a fundamental new mechanism for how plants sense photoperiod \citep{Gendron2023}, but recent results highlight that plants likely have multiple pathways to sense daylength  \citep{wang2024plants} 
+Plants may rely on the solstice as a signal to initiate the shift from growth to tissue maturation before winter and to prepare for reproduction in the following year through flower bud differentiation \citep{Rossi2006, Zohner2023, Journe2024}. This hypothesis suggests a fundamental new mechanism for how plants sense photoperiod \citep{Gendron2023}, but recent results highlight that plants likely have multiple pathways to sense daylength  \citep{wang2024plants}.
 % vvdm19Jan: I am not 100% sure I get the 'but'
 
 
@@ -54,24 +59,28 @@ Given the importance of GDD, plants should ideally time their transitions when t
 In contrast, growth potential, which we define as the remaining GDD on day $d$ (see Supplementary Methods and Supplementary Figure S1), aims to capture that plants must allow for enough remaining biological time before the end of the GDD season to complete key physiological processes \citep{Zohner2023, Journe2024}. This simple trade-off allows us to examine which window in the season appears optimal for plants to maximize growth and development while minimizing risks. This allows us to test if environmental predictability relative to remaining GDD is optimal at solstice, or if variability in GDD accumulation over the season pushes the optimal timing of transitions sooner or later in the year. 
 
 \begin{figure}[h]
+\vspace*{-0.3cm}
 \centering
 \includegraphics{global_optimality.pdf}
+\vspace*{-0.6cm}
+\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe (1951-2020).} In the left panel, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In the right panel, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the green curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see Supp. Figure S2 for 0-40\degree C).} 
 \vspace*{-0.5cm}
-\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe (1951-2020).} In the left panel, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In the right panel, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the green curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see Figure S2 for 0-40\degree C).} 
 \label{fig:globaloptimality}
 \end{figure}
 
+\clearpage
+
 Using this trade-off framework, we found the optimal period to be near the summer solstice (\Cref{fig:globaloptimality}). Averaging across all of Europe, solstice appears as a critical juncture for the optimization of both environmental predictability and remaining growth potential.
-If this specific day indeed represents a broad-scale optimum across different climatic conditions, evolution towards a universal solstice trigger could make sense---especially since this optimum appears stable over the Holocene (Supplementary Figure S3). 
+If this specific day indeed represents a broad-scale optimum across different climatic conditions, evolution towards a universal solstice trigger could make sense---especially since this optimum appears stable over the Holocene (Supplementary Figure S3), as well as across North America (Supplementary Figure S4).
 
 Our results suggest solstice could act as a reliable marker but also highlight the challenges in disentangling the influence of the solstice from that of a thermal optimum cue. Given our metrics are based only a thermal season---i.e. we do not explicitly incorporate a photoperiod driver---our results suggest the existence of an understudied thermal cue that could give the same outcome.
 Plants could also rely on a combination of both solstice and thermal cues to optimize growth and reproductive timing---which would likely provide greater signal robustness to environmental change through partial redundancy between cues \citep{Bonamour2019}.
 Alternatively, this overlap could simply represent an emergent property of the climate system that plants do not necessarily use as a cue, since it would be costly for plants to closely track two different signals---i.e. to encode and decode both thermal and photoperiod information within their cells. In this case, solstice may merely represent a climatic reality that summer temperatures are relatively stable year-to-year over July and August, and thus average GDD predictability peaks in late June. 
 
-Supporting the hypothesis that solstice may not be a reliable cue, our results reveal substantial variation in the optimal timing when examined across Europe (\Cref{fig:localoptimality}), as opposed to averaging over space (\Cref{fig:globaloptimality}). In warmer southern Europe, plants reach an optimum earlier in the season, whereas in northern regions, cooler temperatures delay this timing beyond the solstice. This regional variability suggests that plants should likely rely on cues that allow for a more plastic response in their specific environment than solstice would yield. From a parsimonious perspective, tracking primarily GDD-related cue might be more straightforward and aligned with the actual energy a plant needs to grow and reproduce---i.e. the cue would be sampled from a variable directly used by the plant.
+Supporting the hypothesis that solstice may not be a reliable cue, our results reveal substantial variation in the optimal timing when examined across Europe (\Cref{fig:localoptimality}) and North America (Supplementary Figure S4), as opposed to averaging over space (\Cref{fig:globaloptimality}, Supplementary Figure S5). In warmer southern Europe, plants reach an optimum earlier in the season, whereas in northern regions, cooler temperatures delay this timing beyond the solstice. This regional variability suggests that plants should likely rely on cues that allow for a more plastic response in their specific environment than solstice would yield. From a parsimonious perspective, tracking primarily GDD-related cue might be more straightforward and aligned with the actual energy a plant needs to grow and reproduce---i.e. the cue would be sampled from a variable directly used by the plant.
 Whereas tracking the solstice is likely more complex. Indeed, plants would need to sense not just the photoperiod but also the variation in the rate of change of photoperiod over time---essentially, the second derivative.
 
-Taken together, our results suggest solstice could be an optimal signal for plants to transition key physiological processes when averaged across space, and appears remarkably stable over past and potential future climates  (Supplementary Figures S3 and S4), but is unstable at the local site-level (\Cref{fig:localoptimality}, Supplementary Figure S5). Because selection operates on individuals, this disconnect between the local and continental scales makes it difficult to understand how solstice would evolve as a trigger, and suggests its importance in correlative analyses (such as ours, \citealp{Zohner2023} and \citealp{Journe2024}) may appear due to natural correlations in environmental data that do not shape plant responses \citep[e.g.][]{Gao2024}. Alternatively, our results could suggest an understudied role of solstice in how plants sense photoperiod with potentially deep evolutionary origins \citep{morales2024phylogenetic}. Disentangling these two hypotheses will require new experiments that decouple natural covariation between temperature and photoperiod \citep{Buonaiuto2023, Elmendorf2020} to identify the cues plants use and more efforts to understand the fitness landscape of the growing season across space and time \citep{Park2022}.
+Taken together, our results suggest solstice could be an optimal signal for plants to transition key physiological processes when averaged across space, and appears remarkably stable over past and potential future climates (Supplementary Figures S3, S4 and S6), but is unstable at the local site-level (\Cref{fig:localoptimality}, Supplementary Figures S5 and S7). Because selection operates on individuals, this disconnect between the local and continental scales makes it difficult to understand how solstice would evolve as a trigger, and suggests its importance in correlative analyses (such as ours, \citealp{Zohner2023} and \citealp{Journe2024}) may appear due to natural correlations in environmental data that do not shape plant responses \citep[e.g.][]{Gao2024}. Alternatively, our results could suggest an understudied role of solstice in how plants sense photoperiod with potentially deep evolutionary origins \citep{morales2024phylogenetic}. Disentangling these two hypotheses will require new experiments that decouple natural covariation between temperature and photoperiod \citep{Buonaiuto2023, Elmendorf2020} to identify the cues plants use and more efforts to understand the fitness landscape of the growing season across space and time \citep{Park2022}.
 
 
 

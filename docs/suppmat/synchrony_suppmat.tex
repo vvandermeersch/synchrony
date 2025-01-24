@@ -65,19 +65,40 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 
 \begin{figure}[h]
 \centering
-\includegraphics{global_optimality_0_40.pdf} %emw19Jan -- I would contrast this a bit more with the next figure in the caption similar to what I suggested in main text. So in the next figure caption you should stress how this is different from findings of the average and here you could even reference the next figure if you like.... 
-\vspace*{-0.4cm}
+\includegraphics[scale = .9]{global_optimality_0_40.pdf} %emw19Jan -- I would contrast this a bit more with the next figure in the caption similar to what I suggested in main text. So in the next figure caption you should stress how this is different from findings of the average and here you could even reference the next figure if you like.... 
+\vspace*{-0.cm}
 \caption{\textbf{Average optimal trade-off between environmental predictability and growth potential across Europe, with an alternative GDD definition} ($T_{lower}=0$\degree C and $T_{upper}=40$\degree C).}
 \label{fig:altgdd}
 \end{figure}
 
 
 \begin{figure}[h]
+\vspace*{-0.3cm}
 \hspace*{-1.2cm}
 \includegraphics[scale = 1]{optimality_holocene.pdf}
 \vspace*{-0.7cm}
 \caption{\textbf{The average optimal trade-off between environmental predictability and growth potential is relatively stable across the Holocene.} Daily mean temperatures were obtained from \citet{VanderMeersch2024}, in which daily data were generated with the GWGEN weather generator \citep{Sommer2017} based on monthly paleosimulations from the HadCM3B-M2.1 coupled general circulation model \citep{Armstrong2019}. BP stand for "Before Present" (i.e. 1950).}
 \label{fig:holocene}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale = 1]{global_optimality_northamerica.pdf}
+	\vspace*{-0.2cm}
+	\caption{\textbf{Solstice also marks the average optimal trade-off between environmental predictability and growth potential across North America (1951-2020).} The red sections of the green curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days).}
+	\label{fig:global_norame}
+	\vspace*{-10cm}
+\end{figure}
+
+% \clearpage
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale = 1]{local_optimality_norame.pdf}
+	\vspace*{-0.2cm}
+	\caption{\textbf{Average optimal timing (\Cref{fig:global_norame}) hides variation in optimal timing across the different climatic conditions of North America (1951-2020).} On the left panel, each curve shows the optimality for a given site. Sites are sampled on a regular grid across Europe, as shown on the central map. Colors indicate the timing---relative to the solstice---of the median optimal day.}
+	\label{fig:holocene}
 \end{figure}
 
 
@@ -88,12 +109,10 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \vspace*{-0.5cm}
 \caption{\textbf{Average optimal trade-off between environmental predictability and growth potential in future climates (2071-2100).} Daily mean temperatures came from the last Coupled Model Intercomparison Project Phase 6 (CMIP6) climate  projections, for 5 global climate models (GCMs) and 2 shared socio-economic pathways (SSPs). Model projections were downscaled to a 0.1° resolution with a statistical trend-preserving method (the cumulative distribution function transform), using the ERA5-Land reanalysis as a reference observational dataset between 1981 and 2010 \citep{Noel2022}. Thin lines represent the five GCMs (GFDL-ESM4, IPSL-CM6A-LR, MPI-ESM1-2-HR, MRI-ESM2-0 and UKESM1-0-LL), large lines represent the average across GCMs.}
 \label{fig:future}
-\vspace*{-10cm}
+
 \end{figure}
 
-\clearpage
 
-\vspace*{-1.2cm}
 \begin{figure}[h]
 \centering
 \includegraphics[scale = 1]{local_optimality_future.pdf}
@@ -101,6 +120,8 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \caption{\textbf{Average optimal timing (\Cref{fig:future}) hides variation in optimal timing across the different future climatic conditions of Europe (2071-2100).} On the top panel, sites are sampled on a regular grid across Europe. On the bottom panel, Sankey diagrams show the proportional flow of (site-specific) optimal timing from 1951-2020 to 2071-2100. Colors indicate the timing—relative to the solstice—of the median optimal day.}
 \label{fig:futurelocal}
 \end{figure}
+
+\clearpage
 
 {\footnotesize
 \vspace*{0cm}
