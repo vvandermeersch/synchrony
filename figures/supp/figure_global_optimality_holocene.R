@@ -3,7 +3,7 @@
 # Supp figure S3: Holocene optimality #
 #-------------------------------------#
 
-wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
+wd <- "~/projects/synchrony"
 source(file.path(wd, "scripts", "preamble.R"))
 
 periods <- seq(2000,11000,3000)
@@ -12,38 +12,35 @@ optimality_holocene <- lapply(periods, function(p) readRDS(file.path(wd, "data/p
 optimality_holocene <- as.data.frame(do.call(rbind, optimality_holocene))
 optimality_holocene$period <- factor(paste(optimality_holocene$period, "BP"), levels = paste(periods, "BP"))
 
-local_optima <- optimality_holocene %>%
+local_optima_hol <- optimality_holocene %>%
   group_by(period, id) %>%
   mutate(q95 = quantile(opt, 0.9)) %>%
   dplyr::filter(opt > q95) 
 
-global_optimum <- optimality_holocene %>% 
+global_optimum_hol <- optimality_holocene %>% 
   group_by(period, doy) %>%
   summarise(opt = median(opt), env_pred = median(env_pred), growth_pot=median(growth_pot)) %>%
   mutate(q95 = quantile(opt, 0.9), opt_period = opt > q95)
 
-optimum_plot <- ggplot() +
+optimum_plot_hol <- ggplot() +
   facet_wrap(~ period, nrow = 1) +
   geom_vline(xintercept = 172, linetype = "dashed", 
              color = "grey70", linewidth = 0.4) +
-  geom_boxplot(aes(x = doy, y = max(global_optimum$opt) +0.03),
+  geom_boxplot(aes(x = doy, y = max(global_optimum_hol$opt) +0.03),
                width = 0.015, color = "#c1121f",
                linewidth = 0.3, outliers = FALSE,
-               data = local_optima) +
+               data = local_optima_hol) +
   # geom_line(aes(y = opt, x = doy), 
   #           data = global_optimum,
   #           color = "white", linewidth = 1.5) +
   geom_line(aes(y = opt, x = doy, color = opt_period, group = 1), 
-            data = global_optimum,
+            data = global_optimum_hol,
             linewidth = 0.6, lineend = "round") +
   scale_color_manual(values = c("#87c7ee", "#c1121f")) +
   theme_bw() +
-  theme(legend.position = 'none', panel.grid = element_blank(),
-        strip.background = element_blank(), 
-        axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 9)) +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
-                  ylim = c(min(global_optimum$opt), max(global_optimum$opt) +0.05), 
+                  ylim = c(min(global_optimum_hol$opt), max(global_optimum_hol$opt) +0.05), 
                   expand = FALSE) +
   theme(legend.position = 'none', panel.grid = element_blank(),
         strip.background = element_blank(), 
@@ -53,4 +50,4 @@ optimum_plot <- ggplot() +
         axis.ticks = element_line(color = "grey30", linewidth = 0.3))
 
 cowplot::ggsave2(filename = file.path(wd, "figures/supp", "optimality_holocene.pdf"),
-                 plot = optimum_plot, device = cairo_pdf, width = 180, height = 58, unit = "mm")
+                 plot = optimum_plot_hol, device = cairo_pdf, width = 180, height = 58, unit = "mm")

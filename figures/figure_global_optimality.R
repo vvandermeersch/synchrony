@@ -4,8 +4,8 @@
 #---------------#
 
 library(patchwork)
-wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
-# source(file.path(wd, "scripts", "preamble.R"))
+wd <- "~/projects/synchrony"
+source(file.path(wd, "scripts", "preamble.R"))
 
 # Load data
 optimality <- readRDS(file.path(wd, "data/processed/era5land",  paste0("optimality_", 1951 ,"_", 2020, "_", "tlow", 5, "_tupp", 35, ".rds")))
@@ -37,13 +37,13 @@ pareto_front <- ggplot() +
   scale_fill_distiller(type = "seq", direction = 1, palette = "Greys") +
   geom_line(aes(y = env_pred, x = growth_pot), 
             data = global_optimum, 
-            color = "white", linewidth = 1.1) +
+            color = "white", linewidth = 1.2) +
   geom_line(aes(y = env_pred, x = growth_pot, color = opt_period, group = 1), 
             data = global_optimum, lineend = "round",
             linewidth = 0.6) +
   geom_point(aes(y = env_pred, x = growth_pot, color = opt_period), 
             data = global_optimum,
-            size = 0.3)
+            size = 0.3) +
   geom_segment(aes(x = max_growth_pot, y = 1, xend = bmin$growth_pot, yend = bmin$env_pred),
                color = "#c1121f", linewidth = 0.3, alpha = 0.9, linetype = "dashed") +
   geom_segment(aes(x = max_growth_pot, y = 1, xend = bmax$growth_pot, yend = bmax$env_pred),
@@ -53,7 +53,8 @@ pareto_front <- ggplot() +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
-        plot.margin = margin(t = 0, b = 0, l = 0, r = 6.5)) +
+        plot.margin = margin(t = 0, b = 0, l = 0, r = 6.5),
+        panel.border=element_rect(color = "grey30")) +
   coord_fixed(ratio = max_growth_pot,
               xlim = c(0, max_growth_pot),
               ylim = c(0,1), expand = FALSE) +
@@ -79,7 +80,8 @@ optimum_plot <- ggplot() +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
         axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
-        plot.margin = margin(t = 0, b = 0, l = 6.5, r = 0)) +
+        plot.margin = margin(t = 0, b = 0, l = 6.5, r = 0),
+        panel.border=element_rect(color = "grey30")) +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(global_optimum$opt), max(global_optimum$opt) + 0.06), 

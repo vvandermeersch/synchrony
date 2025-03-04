@@ -4,7 +4,7 @@
 #--------------------------------------------------#
 
 library(ggsankey)
-wd <- "C:/Users/vandermeersch/Documents/CEFE/projects/synchrony"
+wd <- "~/projects/synchrony"
 source(file.path(wd, "scripts", "preamble.R"))
 
 models <- c("GFDL-ESM4", "IPSL-CM6A-LR", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
