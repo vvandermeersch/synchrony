@@ -1,5 +1,5 @@
 \documentclass[11pt,letter]{article}
-\usepackage[top=0.70in, bottom=0.8in, left=1.1in, right=1.1in]{geometry}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{xcolor} 
 \definecolor{Accent}{HTML}{bd2b00} 
@@ -96,7 +96,7 @@ Whereas tracking the solstice is likely more complex. Indeed, plants would need 
 
 Taken together, our results suggest solstice could be an optimal signal for plants to transition key physiological processes when averaged across space, and appears remarkably stable over past and potential future climates (\Cref{fig:globaloptimality}), but is unstable at the local site-level (\Cref{fig:localoptimality}, \Cref{fig:futurelocal}). Because selection operates on individuals, this disconnect between the local and continental scales makes it difficult to understand how solstice would evolve as a trigger, and suggests its importance in correlative analyses (such as ours, \citealp{Zohner2023} and \citealp{Journe2024}) may appear due to natural correlations in environmental data that do not shape plant responses \citep[e.g.][]{Gao2024}. Alternatively, our results could suggest an understudied role of solstice in how plants sense photoperiod with potentially deep evolutionary origins \citep{morales2024phylogenetic}. Disentangling these two hypotheses will require new experiments that decouple natural covariation between temperature and photoperiod \citep{Buonaiuto2023, Elmendorf2020} to identify the cues plants use and more efforts to understand the fitness landscape of the growing season across space and time \citep{Park2022}.
 
-\begin{figure}
+\begin{figure} [h]
 %	\centering
 %	\includegraphics[scale = 1]{../figures/supp/local_optimality_future.pdf}
 %	\vspace*{0.3cm}
@@ -129,36 +129,36 @@ For the paleoclimate analysis, daily mean temperatures at a 0.25\degree~resoluti
 %emw19Jan -- Can you explain where the 1.414 comes from a little? 
 We computed an optimality measure based on the Euclidean distance $D$ from  the ideal point where both predictability and growth potential (scaled to $[0,1]$) are maximized (green panel, \Cref{fig:method}). Optimality was defined as $max(D)-D$ (where $max(D)$ is the Euclidean distance between the point $(0,0)$ and the point $(1,1)$, i.e. $max(D)=\sqrt{1^2+1^2}\approx1.414$)---such that higher values correspond to more optimal days. Days were classified as optimal if they fell within the top 10\% of days with the higher optimality.
 
-\newpage
-
 \let\oldthefigure\thefigure
 \renewcommand{\thefigure}{S\oldthefigure}
 \setcounter{figure}{0}  
 
-\begin{figure}
+\vspace{2cm}
+
+\begin{figure}[h]
 	\caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}} %emw19Jan -- This figure is so nice and super helpful for readers.
 	\label{fig:method}
-\end{figure}
+	\vspace{0.5cm}
 
-\begin{figure}
+
+
 	\caption{\textbf{Average optimal trade-off between environmental predictability and growth potential across Europe, with an alternative GDD definition} ($T_{lower}=0$\degree C and $T_{upper}=40$\degree C).}
 	\label{fig:altgdd}
-\end{figure}
+	\vspace{0.5cm}
 
-\begin{figure}
+
+
 	\caption{\textbf{Solstice also marks the average optimal trade-off between environmental predictability and growth potential across North America (1951-2020).} The red sections of the green curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days).}
 	\label{fig:global_norame}
-\end{figure}
+	\vspace{0.5cm}
 
-\begin{figure}
+
 	\caption{\textbf{Average optimal timing (\Cref{fig:global_norame}) hides variation in optimal timing across the different climatic conditions of North America (1951-2020).} On the left panel, each curve shows the optimality for a given site. Sites are sampled on a regular grid across Europe, as shown on the central map. Colors indicate the timing---relative to the solstice---of the median optimal day.}
 	\label{fig:local_norame}
 \end{figure}
 
 
-
 \clearpage
-
 \bibliography{synchrony}
 
 \end{document}
