@@ -72,7 +72,7 @@ If this specific day indeed represents a broad-scale optimum across different cl
 %	\includegraphics{../figures/figure1_enriched}
 %	\vspace*{-0.6cm}
 	\vspace*{0.3cm}
-	\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe.} \textbf{(a,b)} represents current climatic conditions (1951-2020), \textbf{(c)} represents past climatic conditions (11000 BP and 2000 BP, where BP stand for "Before Present"), and \textbf{(d)} represents future climatic conditions (for two emission scenarios, SSP2-4.5 and SSP5-8.5). In \textbf{(a)}, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In \textbf{(b,c,d)}, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in the left panel). The red sections of the curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see \Cref{fig:altgdd} for 0-40\degree C). BP stand for "Before Present" (i.e. 1950).} 
+	\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe.} \textbf{(a,b)} represents current climatic conditions (1951-2020), \textbf{(c)} represents past climatic conditions (11000 BP and 2000 BP, where BP stand for "Before Present"), and \textbf{(d)} represents future climatic conditions (2070-2100, for two emission scenarios, SSP2-4.5 and SSP5-8.5). In \textbf{(a)}, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In \textbf{(b,c,d)}, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in \textbf{(a)}). The red sections of the curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see \Cref{fig:altgdd} for 0-40\degree C).} 
 	\label{fig:globaloptimality}
 \end{figure}
 
@@ -96,13 +96,13 @@ Whereas tracking the solstice is likely more complex. Indeed, plants would need 
 
 Taken together, our results suggest solstice could be an optimal signal for plants to transition key physiological processes when averaged across space, and appears remarkably stable over past and potential future climates (\Cref{fig:globaloptimality}), but is unstable at the local site-level (\Cref{fig:localoptimality}, \Cref{fig:futurelocal}). Because selection operates on individuals, this disconnect between the local and continental scales makes it difficult to understand how solstice would evolve as a trigger, and suggests its importance in correlative analyses (such as ours, \citealp{Zohner2023} and \citealp{Journe2024}) may appear due to natural correlations in environmental data that do not shape plant responses \citep[e.g.][]{Gao2024}. Alternatively, our results could suggest an understudied role of solstice in how plants sense photoperiod with potentially deep evolutionary origins \citep{morales2024phylogenetic}. Disentangling these two hypotheses will require new experiments that decouple natural covariation between temperature and photoperiod \citep{Buonaiuto2023, Elmendorf2020} to identify the cues plants use and more efforts to understand the fitness landscape of the growing season across space and time \citep{Park2022}.
 
-\begin{figure} [h]
-%	\centering
-%	\includegraphics[scale = 1]{../figures/supp/local_optimality_future.pdf}
-%	\vspace*{0.3cm}
-	\caption{\textbf{Average optimal timing (\Cref{fig:globaloptimality}) hides variation in optimal timing across the different future climatic conditions of Europe (2071-2100).} On the top panel, sites are sampled on a regular grid across Europe. On the bottom panel, Sankey diagrams show the proportional flow of (site-specific) optimal timing from 1951-2020 to 2071-2100. Colors indicate the timing—relative to the solstice—of the median optimal day.}
-	\label{fig:futurelocal}
-\end{figure}
+%\begin{figure} [h]
+%%	\centering
+%%	\includegraphics[scale = 1]{../figures/supp/local_optimality_future.pdf}
+%%	\vspace*{0.3cm}
+%	\caption{\textbf{Average optimal timing (\Cref{fig:globaloptimality}) hides variation in optimal timing across the different future climatic conditions of Europe (2071-2100).} On the top panel, sites are sampled on a regular grid across Europe. On the bottom panel, Sankey diagrams show the proportional flow of (site-specific) optimal timing from 1951-2020 to 2071-2100. Colors indicate the timing—relative to the solstice—of the median optimal day.}
+%	\label{fig:futurelocal}
+%\end{figure}
 
 \subsection*{Materials and methods}
 
@@ -155,10 +155,15 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 
 	\caption{\textbf{Average optimal timing (\Cref{fig:global_norame}) hides variation in optimal timing across the different climatic conditions of North America (1951-2020).} On the left panel, each curve shows the optimality for a given site. Sites are sampled on a regular grid across Europe, as shown on the central map. Colors indicate the timing---relative to the solstice---of the median optimal day.}
 	\label{fig:local_norame}
+	
+	%	\centering
+	%	\includegraphics[scale = 1]{../figures/supp/local_optimality_future.pdf}
+	%	\vspace*{0.3cm}
+		\caption{\textbf{Average optimal timing (\Cref{fig:globaloptimality}) hides variation in optimal timing across the different future climatic conditions of Europe (2071-2100).} On the top panel, sites are sampled on a regular grid across Europe. On the bottom panel, Sankey diagrams show the proportional flow of (site-specific) optimal timing from 1951-2020 to 2071-2100. Colors indicate the timing—relative to the solstice—of the median optimal day.}
+		\label{fig:futurelocal}
+	
 \end{figure}
 
-
-\clearpage
 \bibliography{synchrony}
 
 \end{document}
