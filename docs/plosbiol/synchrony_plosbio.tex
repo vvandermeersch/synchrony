@@ -72,7 +72,7 @@ If this specific day indeed represents a broad-scale optimum across different cl
 %	\includegraphics{../figures/figure1_enriched}
 %	\vspace*{-0.6cm}
 	\vspace*{0.3cm}
-	\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe.} \textbf{(a,b)} represents current climatic conditions (1951-2020), \textbf{(c)} represents past climatic conditions (11000 BP and 2000 BP, where BP stand for "Before Present"), and \textbf{(d)} represents future climatic conditions (2070-2100, for two emission scenarios, SSP2-4.5 and SSP5-8.5). In \textbf{(a)}, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In \textbf{(b,c,d)}, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in \textbf{(a)}). The red sections of the curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see \Cref{fig:altgdd} for 0-40\degree C).} 
+	\caption{\textbf{Solstice marks the average optimal trade-off between environmental predictability and growth potential across Europe.} \textbf{(a,b)} represent current climatic conditions (1951-2020), \textbf{(c)} represents past climatic conditions (11000 BP and 2000 BP, where BP stand for "Before Present"), and \textbf{(d)} represents future climatic conditions (2070-2100, for two emission scenarios, SSP2-4.5 and SSP5-8.5). In \textbf{(a)}, environmental predictability measures how well GDD by a given day predicts total yearly GDD ($R^2$ of a linear regression across years), while growth potential represents the remaining GDD from that day onward. In \textbf{(b,c,d)}, optimality is based on the Euclidean distance from the (unattainable) perfect point where both predictability and growth potential are maximized (illustrated by the red dashed lines and the gray gradient in \textbf{(a)}). The red sections of the curves represent days where optimality falls within the 90th percentile (i.e. top 10\% most optimal days). GDD range was defined between 5\degree C and 35\degree C (see \Cref{fig:altgdd} for 0-40\degree C).} 
 	\label{fig:globaloptimality}
 \end{figure}
 
@@ -109,6 +109,16 @@ Taken together, our results suggest solstice could be an optimal signal for plan
 %emw19Jan -- I would use active voice a little more, but this sees okay. 
 All analyses were run on \textbf{\textsf{R}}, using the package \texttt{terra} for raster manipulation \citep{Hijmans2024}. The workflow of the analysis is represented in \Cref{fig:method}.
 
+\begin{figure}[h]
+	%	 \centering
+	%	\hspace*{-1.2cm}
+	%	\includegraphics{../figures/local_optimality_alt}
+	%	\vspace*{-0.9cm} %emw19Jan -- I tried to spell out a little more this difference in optimal for the average versus for each site.
+	\vspace*{0.3cm}
+	\caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}}
+	\label{fig:method}
+\end{figure}
+
 \paragraph{Climate data}
 We extracted daily mean temperatures, from 1951 to 2020, from the ERA5-Land dataset, at a 0.1\degree~spatial resolution \citep{MunozSabater2021}. We sampled $>$500 sites on a regular grid across Europe (see \Cref{fig:localoptimality}).\\
 Following \citet{McMaster1997}, we define growing degree-days at a day d ($GDD_d$) as:
@@ -136,9 +146,9 @@ We computed an optimality measure based on the Euclidean distance $D$ from  the 
 \vspace{2cm}
 
 \begin{figure}[h]
-	\caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}} %emw19Jan -- This figure is so nice and super helpful for readers.
-	\label{fig:method}
-	\vspace{0.5cm}
+	%\caption{\textbf{Workflow of the optimality analysis for one site in Southern Europe.}} %emw19Jan -- This figure is so nice and super helpful for readers.
+	%\label{fig:method}
+	%\vspace{0.5cm}
 
 
 
