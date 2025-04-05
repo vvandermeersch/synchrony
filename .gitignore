@@ -21,3 +21,7 @@ docs/plosbiol
 *.png
 *.bcf
 *.xml
+*.fdb_latexmk
+*.fls
+*blx.bib
+
