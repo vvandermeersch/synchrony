@@ -49,12 +49,12 @@ pareto_front <- ggplot() +
   geom_segment(aes(x = max_growth_pot, y = 1, xend = bmax$growth_pot, yend = bmax$env_pred),
                color = "#c1121f", linewidth = 0.3, alpha = 0.9 , linetype = "dashed") +
   scale_color_manual(values = c("#17a353", "#c1121f")) +
-  scale_x_continuous(position = "top") +
+  scale_x_continuous(position = "bottom") +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
-        axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
+        axis.text = element_text(size = 7.5, color = "grey20"), axis.title = element_text(size = 8, color = "grey20"),
         plot.margin = margin(t = 0, b = 0, l = 0, r = 6.5),
-        panel.border=element_rect(color = "grey30")) +
+        panel.border=element_rect(color = "grey30", linewidth = 0.3),  axis.ticks = element_line(color = "grey30", linewidth = 0.3)) +
   coord_fixed(ratio = max_growth_pot,
               xlim = c(0, max_growth_pot),
               ylim = c(0,1), expand = FALSE) +
@@ -79,9 +79,10 @@ optimum_plot <- ggplot() +
   scale_color_manual(values = c("#17a353", "#c1121f")) +
   theme_bw() +
   theme(legend.position = 'none', panel.grid = element_blank(), strip.background = element_blank(),
-        axis.text = element_text(size = 7.5), axis.title = element_text(size = 8),
-        plot.margin = margin(t = 0, b = 0, l = 6.5, r = 0),
-        panel.border=element_rect(color = "grey30")) +
+        axis.text = element_text(size = 7.5, color = "grey20"), axis.title = element_text(size = 8, color = "grey20"),
+        plot.margin = margin(t = 0, b = 1, l = 6.5, r = 0),
+        panel.border= element_blank(),  axis.ticks = element_line(color = "grey30", linewidth = 0.3),
+        axis.line = element_line(color = "grey30", linewidth = 0.3)) +
   labs(y = "Optimality", x= "DOY") +
   coord_cartesian(xlim = c(0,365), 
                   ylim = c(min(global_optimum$opt), max(global_optimum$opt) + 0.06), 
