@@ -21,6 +21,8 @@ countries <- c("Austria", "Belarus", "Belgium", "Bulgaria", "Croatia", "Cyprus",
 world_map <- rnaturalearth::ne_countries(scale="medium",returnclass = 'sf')
 eu_map <- world_map %>% filter(sovereignt %in% countries) %>% vect() %>% crop(ext(c(-11.5, 34, 35, 71)))
 
+norame_map <- world_map %>% filter(sovereignt %in% c("United States of America", "Canada", "Mexico")) %>% vect() %>% crop(ext(c(-129, -65, 28, 53)))
+
 # world_map %>% filter(sovereignt %in% countries) %>% vect() %>% project("EPSG:3035") %>% crop(c(2.2e6, 6e6, 1.4e6, 5.4e6)) %>% 
 #   project("EPSG:4326")
 
