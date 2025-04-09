@@ -36,11 +36,18 @@
 
 \DeclareEmphSequence{\itshape\color{darkgrey}}
 \usepackage[most]{tcolorbox}
+% \newtcolorbox{mybox}[1][]{%
+%     blanker, 
+%     left skip=0em,
+%     left=1em,
+%     borderline west={1pt}{2pt}{darkgrey},
+%     breakable,
+%     #1}
 \newtcolorbox{mybox}[1][]{%
     blanker, 
     left skip=0em,
-    left=1em,
-    borderline west={1pt}{2pt}{darkgrey},
+    left=0em,
+    borderline west={0pt}{0pt}{white},
     breakable,
     #1}
 
@@ -56,25 +63,24 @@ Editor and reviewer comments (we provide below the full context of the two revie
 \emph{Both reviewers found this contribution quite interesting. Rev. 1 raises an important question about the overlooked role of moisture availability as an additional, interacting and important control over phenology. This and all other points raised by both reviewers should be thoroughly addressed in a revision. In addition, I have two more comments.}
 \end{mybox}
 
-We are happy to hear that the value of our work was recognized by both reviewers and appreciate the opportunity to revise our manuscript. We have worked to clarify the points raised by the editor and the 2 reviewers in this new version. \\
+We are happy to hear that by both reviewers recognized the value of our work and we appreciate the opportunity to revise our manuscript. We have worked to clarify the points raised by the editor and the two reviewers in this new version. \\
 
 \begin{mybox}
-\emph{First, and in contrast to Rev. 2, I found the hypothesis(es) hard to disentangle. The Introduction begins by discussing how plants use cues to "adjust" their phenology to variable conditions, but then segues quickly into plants' use of the fixed cue of summer solstice, without explaining this seeming disconnect. It then begins referring to "this hypothesis" and "this proposed photoperiod switch" (and so on) without ever clearly and simply stating the hypothesis. In the results, the "hypothesis that solstice is not a reliable cue" is then proposed, which violates the standard definition of a hypothesis in that it states a lack of effect rather than an effect. Hypotheses stated in more definite wording would greatly help the flow of the paper}
+\emph{First, and in contrast to Rev. 2, I found the hypothesis(es) hard to disentangle. The Introduction begins by discussing how plants use cues to ``adjust" their phenology to variable conditions, but then segues quickly into plants' use of the fixed cue of summer solstice, without explaining this seeming disconnect. It then begins referring to ``this hypothesis" and ``this proposed photoperiod switch" (and so on) without ever clearly and simply stating the hypothesis. In the results, the ``hypothesis that solstice is not a reliable cue" is then proposed, which violates the standard definition of a hypothesis in that it states a lack of effect rather than an effect. Hypotheses stated in more definite wording would greatly help the flow of the paper}
 \end{mybox}
 
 We apologize for the lack of clarity. We have revised the beginning of our introduction to clarify the transition between the general discussion of environmental cues and the specific focus on solstice, and to introduce the solstice hypothesis more clearly and explicitly.% Consider removing trigger from the paper? If you do I would mention it here, saying you followed language in previous studies, but now see it made the hypotheses and paper less clear, so now focus mainly on using 'cue' and explaining the hypotheses more clearly. 
 
-We also removed the mention of "hypothesis" in the Results, and now state (\href{file:synchrony_r1\#lintarget:nohypo}{line \ref*{lin:nohypo}}):
+We also removed the mention of ``hypothesis'' in the Results, and now state (\href{file:synchrony_r1\#lintarget:nohypo}{line \ref*{lin:nohypo}}):
 \begin{quote}
-    ``Solstice appears as a less reliable cue across space. We found substantial variation in the optimal timing when examined across Europe [...]''
+    ``Summer solstice appears as a less reliable cue across space. We found substantial variation in the optimal timing when examined across Europe and North America [...]''
 \end{quote}
 
 \begin{mybox}
 \emph{Second, and as mentioned by Rev. 2, I wondered about the implications of the particular geographic (including latitudinal) scope of this Europe-based study. For an idea that is being put forward as a general explanation of a global phenomenon, more attention needs to be paid (at least verbally) to its applicability to the rest of the world.}
 \end{mybox}
 
-We agree that we should have made the scope of the study clearer---thank you for highlighting it. We now clarify at the beginning of the Introduction that the summer solstice hypothesis has been proposed for temperate trees in the Northern Hemisphere. In addition, we added a sentence to the final paragraph highlighting the need for future research in other regions of the world.\\
-Please note that we also added two inset plots for North America in Fig. 1 and Fig. 2 (previously \emph{data not shown}).\\
+We agree and have now  made the scope of the study clearer, by adding two inset plots for North America in Fig. 1 and Fig. 2 (previously \emph{data not shown}). We also clarify at the beginning of the Introduction that the summer solstice hypothesis has been proposed for temperate trees in the Northern Hemisphere (\href{file:synchrony_r1\#lintarget:temptree}{lines \ref*{lin:temptree}}, \href{file:synchrony_r1\#lintarget:north}{\ref*{lin:north}} \& \href{file:synchrony_r1\#lintarget:moist}{\ref*{lin:moist}}).\\
 
 {\bf Response to reviewers' comments:} 
 
@@ -84,14 +90,14 @@ Please note that we also added two inset plots for North America in Fig. 1 and F
 \emph{This is an interesting assessment of the potential importance of summer solstice in cueing phenophase timing in terrestrial plants. The analysis is largely sound, but the sole focus on growing degree days (GDD) in defining growth potential beyond a given day of year is a little concerning.}
 \end{mybox}
 
-We thank you for their positive comments regarding our manuscript and appreciate that you see the value in these analyses.\\
+We thank the reviewer for their positive comments regarding our manuscript and appreciate their concerns regarding moisture. We detail our changes regarding this below.\\
 
 \begin{mybox}
 \emph{In particular, there is no consideration given to potential tradeoffs involving moisture availability. Garonna et al (2018 Environ. Res. Lett. 13 024025) argued pretty convincingly for shifting tradeoffs among photoperiod, temperature, and vapor pressure deficit as primary constraints on seasonal growth timing, with the implication being that alleviations or strengthening of one or two of those factors will lead to strengthening or alleviation, respectively, of the third. So while the focus on GDD is understandable, is it reasonable to expect the importance of heat accumulation to remain constant if it's also accompanied by increasing moisture limitation? The approach/framework feels a little like begging the question. I'm not suggesting that makes the manuscript uninteresting or unimportant, but it does leave me uncertain of the fit for PNAS.}
 \end{mybox}
 
 Thank you for drawing our attention to this important point. 
-We focused on thermal cues as a simple alternative to the solstice hypothesis, but we agree that this approach does not capture the full complexity of tree growth dynamics across all ecosystems. Both soil moisture and vapor pressure deficit strongly influence plant water status and can constrain growth, particularly in water-limited regions, leading to a summer interruption of growth (e.g. from mid-July to mid-September in southern France, \citet{}). We now acknowledge this limitation more explicitly throughout the manuscript and have incorporated the suggested reference \citep{Garonna2018}, as well as \citet{Zhao2010} and \citet{Seo2025}.\\
+We focused on thermal cues as a simple alternative to the solstice hypothesis, but we agree that this approach does not capture the full complexity of tree growth dynamics across all ecosystems. Both soil moisture and vapor pressure deficit strongly influence plant water status and can constrain growth, particularly in water-limited regions, leading to a summer interruption of growth (e.g. from mid-July to mid-September in southern France; \citealt{Lempereur2015}). We now acknowledge this limitation more explicitly throughout the manuscript (lines \href{file:synchrony_r1\#lintarget:moist}{\ref*{lin:moist}}, \href{file:synchrony_r1\#lintarget:moist2}{\ref*{lin:moist2}}, \href{file:synchrony_r1\#lintarget:moist3}{\ref*{lin:moist3}}, \href{file:synchrony_r1\#lintarget:moist4}{\ref*{lin:moist4}} \& \href{file:synchrony_r1\#lintarget:moist5}{\ref*{lin:moist5}}) and have incorporated the suggested reference \citep{Garonna2018}, as well as \citet{Zhao2010} and \citet{Seo2025}.\\
 
 \begin{mybox}
 \emph{Minor comments:\\
@@ -99,27 +105,27 @@ Lines 4-5, the authors state "the fitness landscape shaping selection on these c
 This is a little vague - if it's important and a guiding motivation for this paper then provide an example. Also, "remain" should be "remains".}
 \end{mybox}
 
-We agree that this added unnecessary complexity. We have removed the expression from the Introduction to improve clarity.\\
+We agree that this added unnecessary complexity, and have removed the expression from the Introduction.\\
 
 \begin{mybox}
 \emph{Lines 7-8, the authors state "Recently, summer solstice has been proposed as a universal trigger to modulate cues and initiate key physiological processes".\\
 Here I would suggest adding a little more information such as, for example, in what kinds of plants or systems?}
 \end{mybox}
 
-Thank you for this suggestion. We now explicitly that this hypothesis was proposed for temperate tree species (\href{file:synchrony_r1\#lintarget:temptree}{line \ref*{lin:temptree}}).\\
+Thank you for this suggestion. We now explicitly indicate that this hypothesis was proposed for temperate tree species (\href{file:synchrony_r1\#lintarget:temptree}{line \ref*{lin:temptree}}).\\
 
 \begin{mybox}
 \emph{Lines 15-17, the authors state "This proposed photoperiod switch, if correct, could reshape predictions of forest responses to climate change. Using a fixed date like the solstice as a cue, however, could limit plasticity in how plants respond across their ranges, which span very different climates."\\
 First, what is meant by photoperiod switch? This needs a little clarification. Second, this statement might be tempered by insights from Garonna et al. 2018 as mentioned above.}
 \end{mybox}
 
-Sorry it was not clear. We now introduce the switch in the second paragraph (\href{file:synchrony_r1\#lintarget:switch}{line \ref*{lin:switch}}):
+Our apologies, as we can see now that this was not clear. We now introduce the switch in the second paragraph (\href{file:synchrony_r1\#lintarget:switch}{line \ref*{lin:switch}}):
 \begin{quote}
-    ``Recently, summer solstice has been proposed as a universal cue for temperate trees to switch the way they respond to temperature [...]''
+    ``Recently, summer solstice has been proposed as a universal cue for temperate trees to switch their responses to temperature [...]''
 \end{quote}
 We also now mention the moisture constraints (\href{file:synchrony_r1\#lintarget:moist}{line \ref*{lin:moist}}):
 \begin{quote}
-    ``Further, in temperate latitudes, growing season is likely constrained not only by temperature but also by moisture availability \citep{Garonna2018}.''
+    ``Further, as the growing season is likely to be increasingly constrained by moisture availability in many northern temperate latitudes with climate change \citep{Garonna2018} [...]''
 \end{quote}
 
 \begin{mybox}
@@ -132,7 +138,7 @@ Done.\\
 \emph{Line 33: "has" should be "have"}
 \end{mybox}
 
-Sorry, corrected.\\
+Thank you for catching this, it is now corrected.\\
 
 \begin{mybox}
 \emph{Lines 36-37, the authors state "This heat accumulation is a key factor in development and growth processes of both crops and wild plants."\\
@@ -141,7 +147,7 @@ Not arguing with that claim, but its importance and predictive value varies with
 
 Thank you for this suggestion. We now mention this point (\href{file:synchrony_r1\#lintarget:moist2}{line \ref*{lin:moist2}}):
 \begin{quote}
-    ``along with other constraints such as chilling requirements \citep{Chuine2017} and moisture availability \citep{Garonna2018}''
+    ``alongside other constraints, such as chilling requirements \citep{Chuine2017} and moisture availability \citep{Garonna2018}''
 \end{quote}
 
 \begin{mybox}
@@ -151,14 +157,14 @@ Thank you for this suggestion. We now mention this point (\href{file:synchrony_r
 Thank you for spotting this typo.\\
 We now explicitly acknowledge the limitation of considering only temperature cues:
 \begin{quote}
-    ``Note that we did not consider moisture availability constraints along the growing season, that will likely increase with climate change \citep{Garonna2018, Zhao2010, Seo2025}.''
+    ``We did not consider moisture availability constraints along the growing season, that will likely increase with climate change \citep{Garonna2018, Zhao2010, Seo2025}.''
 \end{quote}
 
 \begin{mybox}
 \emph{"Our results suggest solstice could act as a reliable marker but also highlight the challenges in disentangling the influence of the solstice from that of a thermal optimum cue."}
 \end{mybox}
 
-We are not sure of the reviewer's concerns regarding this sentence, but we have adjusted the paragraph it comes from to stress the relevance of soil moisture as well. \\ % line #
+We are not sure of the reviewer's concerns regarding this sentence, but we have adjusted the next paragraph to stress the relevance of soil moisture as well (\href{file:synchrony_r1\#lintarget:moist5}{line \ref*{lin:moist5}}). \\
 
 {\bf Reviewer 2}
 
@@ -176,8 +182,8 @@ In my opinion the abstract is too short and lacks key information such as the na
 
 We added further details to the abstract to make it more informative:
 \begin{quote}
-    ``Multiple studies have recently proposed the summer solstice as a universal trigger for major plant physiological processes. While this would have strong implications for fundamental plant biology and climate change forecasting, the underlying mechanisms that could explain the emergence and importance of solstice as a cue still remain unclear. Here, we analyze temperature accumulation patterns in relation to the summer solstice across Europe and North America--- in past, historical, and projected future climates. 
-    We show that, on average, the summer solstice coincides with a thermal optimum during the growing season. However, we also find significant local variation in the timing of this optimum, across different climates---suggesting the potential of alternative cues.''
+    ``Multiple studies have recently proposed the summer solstice as a universal cue for major plant physiological processes. While this would have strong implications for fundamental plant biology and climate change forecasting, the underlying mechanisms that could explain the emergence and importance of solstice as a cue still remain unclear. Here, we analyze temperature accumulation patterns in relation to the summer solstice across Europe and North America--- in past, historical, and projected future climates. 
+    We show that, on average, the summer solstice coincides with a thermal optimum during the growing season. However, we also find significant local variation in the timing of this optimum across different climates---suggesting the potential of alternative cues.''
 \end{quote}
 
 \begin{mybox}
@@ -185,7 +191,7 @@ We added further details to the abstract to make it more informative:
 First 2-3 paragraphs: It would be useful to mention the general location of the studies, I presume it is temperate latitudes?}
 \end{mybox}
 
-Thank you for this suggestion, which was also raised by Reviewer 1. We now clarify early in the Introduction that we focus on temperate latitude in the Northern Hemisphere (\href{file:synchrony_r1\#lintarget:temptree}{line \ref*{lin:temptree}}, \href{file:synchrony_r1\#lintarget:north}{line \ref*{lin:north}}). \\
+Thank you for this suggestion, which was also raised by Reviewer 1. We now clarify early in the Introduction that we focus on temperate latitudes in the Northern Hemisphere (\href{file:synchrony_r1\#lintarget:temptree}{lines \ref*{lin:temptree}} \& \href{file:synchrony_r1\#lintarget:north}{\ref*{lin:north}}). \\ % more LINE?
 
 \begin{mybox}
 \emph{L17 - leaf unfolding of what?}
@@ -199,7 +205,7 @@ Thank you for this suggestion, which was also raised by Reviewer 1. We now clari
 
 Thank you for this suggestion. We now mention this point, as well as moisture constraints (\href{file:synchrony_r1\#lintarget:moist2}{line \ref*{lin:moist2}}):
 \begin{quote}
-    ``along with other constraints such as chilling requirements \citep{Chuine2017} and moisture availability \citep{Garonna2018}''
+    ``alongside other constraints, such as chilling requirements \citep{Chuine2017} and moisture availability \citep{Garonna2018}''
 \end{quote}
 
 \begin{mybox}
@@ -224,19 +230,18 @@ Done.\\
 \emph{L50 is the base temperature 0C or some other value?}
 \end{mybox}
 
-Sorry it was not clear. We now explicitly mention the temperature range in the text (\href{file:synchrony_r1\#lintarget:range}{line \ref*{lin:range}}):
-\begin{quote}
-    ``GDD was calculated with a temperature range of 5\degree C to 35\degree C (using 0-40\degree C does not change our results)''
-\end{quote}
+Apologies as we should have included this. We now explicitly mention the temperature range in the text (\href{file:synchrony_r1\#lintarget:range}{line \ref*{lin:range}}).\\
 We found very similar results when using a temperature range of 0\degree C to 40\degree C:
 \begin{figure}[h]
 	\centering
-	\vspace*{-0.4cm}
+	\vspace*{-0.2cm}
 	\includegraphics[scale = .8]{../../suppmat/global_optimality_0_40.pdf}
-	\vspace*{-0.cm}
+	\vspace*{-0.2cm}
 	\caption*{\textbf{Average optimal trade-off between environmental predictability and growth potential across Europe, with an alternative GDD definition} ($T_{lower}=0$\degree C and $T_{upper}=40$\degree C).}
 	\label{fig:altgdd}
+    \vspace*{-0.2cm}
 \end{figure}
+
 % ADD MENTION TO THE REPO AND THE CODE?
 Additionally, we have posted all our code (LINK) and links to the public data so that others can remake this figure with varying GDD thresholds. \\
 
