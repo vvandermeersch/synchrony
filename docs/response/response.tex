@@ -1,8 +1,18 @@
-\documentclass[11pt,letter]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[top=1.00in, bottom=1.0in, left=1.1in, right=1.1in]{geometry}
-\usepackage{graphicx} % Required for inserting images
+\usepackage{hyperref}
+\usepackage[style=authoryear, backend=biber, natbib = true, style=numeric-comp, sortcites, hyperref, sorting=none, giveninits=true, doi=false,isbn=false,url=false,eprint=false, date=year, maxbibnames = 2, backend=bibtex]{biblatex}
+\AtEveryBibitem{\clearfield{pages}}
+\AtEveryBibitem{\clearlist{language}}
+\AtEveryBibitem{%
+  \clearfield{volume}%
+  \clearfield{number}}
+\AtEveryBibitem{\clearfield{title}}
+\renewbibmacro{in:}{}
 
-\title{Response letter} % Title! Research on the summer solstice needs falsifiable predictions
+\addbibresource{/home/victor/projects/synchrony/docs/pnas/synchrony.bib} 
+
+\title{Reply to Michał Bogdziewicz et al.: Research on the summer solstice needs falsifiable predictions} % Title! Research on the summer solstice needs falsifiable predictions
 
 \author{Victor, Lizzie}
 \date{August 2024}
@@ -11,30 +21,24 @@
 
 \maketitle
 
-\section*{Outline}
-
-
-% \item They say... blabla, it has to be solstice, fixed cue blabla\\
-% We agree, the is one of the hypotheses our paper considers and we don't believe our work invalidates it  \\
-% We did not do frost damage (at all), we dit not say solstice is suboptimal \\
-% Our results show osltice is optimal, but also show variation... just as their results do
-
-% citeus -- our PNAS paper
-% citeBogdziewiczresp -- their response 
-
-In (citeus) we showed that summer solstice appears as an optimal time to transition between major physiological growth and reproductive phases. Given a simple trade-off between predicting annual total and remaining thermal heat, summer solstice was optimal on average for Europe over Holocene and future climates, and North America, but with local variation. (citeBogdziewiczresp) interpret our results as invalidating the potential role of solstice in mast seeding, but we suggest they have mis-interpreted our work. We explicitly considered whether  summer solstice may control the timing of mast seeding, and our results do not invalidate this hypothesis. In (citeus) we do, however, consider the potential role of other drivers and raise questions about how to differentiate between them given strong covariation. 
+In \citep{VanderMeersch2025} we showed that summer solstice appears as an optimal time to transition between major physiological growth and reproductive phases. Given a trade-off between predicting total and remaining thermal heat, summer solstice was optimal on average for Europe and North America, but with local variation. Bogdziewicz et al. interpret our results as invalidating the potential role of solstice in mast seeding \citep{Bogdziewiczresponse}, but we suggest they have mis-interpreted our work. We explicitly considered whether solstice may control the timing of mast seeding, and our results do not invalidate this hypothesis. In \citep{VanderMeersch2025} we do, however, consider the potential role of other drivers and raise questions about how to differentiate between them given strong covariation. 
 % Our results do show solstice is optimal, but also highlight some amount of variation across space, and time.
 
-% I have snuck in some of this: However, the lack of quantification of this spatial variation---alongside an omission of possible temporal variation---make it difficult to compare their findings across latitude and with our results. Clearly, variation exists and will happen, but the extent to this variation could possibly invalidate the ``\emph{celestial starting gun}" [sic] hypothesis remains unclear. Similarly, we believe that the lack of a true quantification of the scale under which the ``\emph{remarkable spatial synchrony}" is happening is an important missing piece of this hypothesis.
 % Zohner is really 1-2 weeks AFTER and Journe is BEFORE
-(citeBogdziewiczresp) argue that summer solstice is a better cue for masting than temperature-related cues because it allows for greater synchrony across individuals, whereas we highlight spatial variation in a trade-off based on temperature accumulation. We do not disagree that we show important variability across space. We question, however, their conclusions because: (1) In many masting trees, the strength of synchrony among individuals decays with distance, inconsistent with cuing directly to summer solstice (findCITE), and (2) the strong covariation between summer solstice and balance in annual heat accumulation makes it difficult to reject either as the primary cue---a major message of our paper. Showing a masting pattern consistent with cuing to summer solstice is not the same as demonstrating trees cue to summer solstice.
+Bogdziewicz et al. argue that summer solstice is a better cue for masting than temperature-related cues because it allows for greater synchrony across individuals \citep{Bogdziewiczresponse}, whereas we highlight spatial variation in a trade-off based on temperature accumulation. We do not disagree that we show important variability across space. We question, however, their conclusions because: (i) in many masting trees, the strength of synchrony among individuals decays with distance, inconsistent with cuing directly to summer solstice \citep{Liebhold2004}, and (ii) the strong covariation between summer solstice and balance in annual heat accumulation makes it difficult to reject either as the primary cue---a major message of our paper. Showing a masting pattern consistent with cuing to solstice is not the same as demonstrating trees cue to solstice.
 
-In (citeus) we discuss the challenge in differentiating between cues. Current work on whether the summer solstice acts as ``celestial starting gun'' that starts a ``\emph{temperature sensing window}" has focused on a statistical correlation between an annual metric of seed production and daily temperature to show a shifting correlation may occur near the summer solstice on average, but this timing similarly varies across space (Journe et al., Fig. 1 in citeBogdziewiczresp). These results echo ours (citeus) and thus we are confused as to where citeBogdziewiczresp see a discrepancy between these findings and ours. Identifying what level of variation invalidates the hypothesis seems an important question, especially as research on the role of the summer solstice for both growth (citeZohner) and masting show results with the most likely date before or after the solstice by one or more weeks (e.g., Fig. 1 in submitted response where the `window of opportunity' appears to begin around XX). % Cut words in () here at end?
+In \citep{VanderMeersch2025} we discuss the challenge in differentiating between cues. Current work on whether the summer solstice acts as ``\emph{celestial starting gun}'' %that starts a ``\emph{temperature-sensing window}"
+has focused on a statistical correlation between an annual metric of seed production and daily temperature to show a shifting correlation may occur near the summer solstice on average, but this timing similarly varies across space (\citep{Journe2024}, Fig. 1 in \citep{Bogdziewiczresponse}). These results echo ours \citep{VanderMeersch2025} and thus we are confused as to where Bogdziewicz et al. see a discrepancy between these findings and ours. Identifying what level of variation invalidates the hypothesis seems an important question, especially as research on the role of the summer solstice for both growth \citep{Zohner2023} and masting show results with the most likely date before or after the solstice by one or more weeks. % (e.g., Fig. 1 in submitted response where the `window of opportunity' appears to begin around XX). % Cut words in () here at end?
 
 % Maybe we cut the below paragraph for space? If we want we could sneak some of the second half of it into the second paragraph.
-Understanding what scale of variation to expect on average seems equally important as Developing testable predictions for variation across space. Based on citeBogdziewiczresp  plants across the northern hemisphere would be predicted to mast seed in synchrony, but this is not common (findCITES). Further, while we agree that many economy of scale hypotheses for masting require some level of synchrony to lead to increased fitness, most would not predict such large-scale synchrony (cite Davies and Macpherson, TREE) and may thus predict cues other than solstice. Even in the case of extremely widespread synchrony, whether the solstice alone would be an ideal cue for masting is not clear from current work. 
+Understanding what scale of variation to expect on average seems equally important as developing testable predictions for variation across space. 
+% Based on Bogdziewicz et al. plants across the northern hemisphere would be predicted to mast seed in synchrony \citep{Bogdziewiczresponse}, but this is not common (findCITES).
+While we agree that many economy of scale hypotheses for masting require some level of synchrony to lead to increased fitness, most would not predict such large-scale synchrony \citep{Davies2024} and may thus predict cues other than solstice. Even in the case of extremely widespread synchrony, whether the solstice alone would be an ideal cue for masting is not clear from current work. 
 
-Developing falsifiable predictions to test the role of the solstice---and potentially other cues---in driving masting will be important for fundamental science and forecasting. We hope our work, which built from eco-evolutionary and climatological perspectives (citeus), can help, especially as bounded systems (e.g., the growing season, citebroken stick) and natural climatological trends may lead to interesting patterns with multiple competing explanations leading to very different predictions \cite{Gao2024,decsens}. % for broken stick: https://www.cell.com/trends/ecology-evolution/abstract/S0169-5347(99)01767-X?large_figure=true and/or Morales2005
+Developing falsifiable predictions to test the role of the solstice---and potentially other cues---in driving masting will be important for fundamental science and forecasting. We hope our work, which built from eco-evolutionary and climatological perspectives \citep{VanderMeersch2025}, can help, especially as bounded systems (e.g., the growing season, \citep{Colwell2000, Morales2005}) and natural climatological trends may lead to interesting patterns with multiple competing explanations and different predictions \citep{Gao2024,decsens}. % for broken stick: https://www.cell.com/trends/ecology-evolution/abstract/S0169-5347(99)01767-X?large_figure=true and/or Morales2005
 % Our goal in (citeus) was to encourage this discussion by to consider the link between the solstice and these processes through a broader lens---both from a climatological and an eco-evolutionary perspectives. Our work did not aim at refuting any specific hypothesis. Instead, we believe it emphasizes that robust science depends on considering multiple mechanisms and alternative hypotheses---always with a particular caution about any causal links we believe we are testing. 
+
+\paragraph{References}
+\printbibliography[heading=none]
 
 \end{document}
